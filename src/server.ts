@@ -17,9 +17,10 @@ app.use(cors());
 app.use(helmet());
 app.use(express.json());
 
-const personas: Persona[] = [
+let idPersona = 2;
+let personas: Persona[] = [
     {
-            id: '1',
+            id: 1,
             nombre: 'Juan',
             apellido: 'Perez',
             dni: '20348784',
@@ -36,7 +37,7 @@ const personas: Persona[] = [
                     numeroChasis: '87052',
                     motor: 'FFAANN',
                     dueñoId: '1',
-                    id: '1'
+                    id: 1
                 }
             ]
         }
@@ -61,7 +62,7 @@ app.get('/persona', (req, res) => {
 
 
 app.get('/persona/:id', (req, res) => {
-    const { id } = req.params;
+    const id = Number(req.params.id);
     const persona = personas.find(p => p.id === id);
 
     if (persona) {
@@ -72,7 +73,7 @@ app.get('/persona/:id', (req, res) => {
   });
 
   app.put('/persona/:id', (req, res) => {
-    const { id } = req.params;
+    const  id = Number(req.params);
     const { nombre, apellido, dni, fechaNacimiento, genero, donanteDeOrganos } = req.body;
 
     //findIndex devuelve la posicion en la lista, si no existe devuelve menos 1
@@ -93,13 +94,46 @@ app.get('/persona/:id', (req, res) => {
         genero: genero ?? personaAct.genero,
         donanteDeOrganos: donanteDeOrganos ?? personaAct.donanteDeOrganos,
       };
-      res.status(201).json({ message: 'Persona actualizada correctamente', persona: personas[personaIndex] });
+      res.status(201).json({ mensaje: 'Persona actualizada correctamente', persona: personas[personaIndex] });
     } else {
       res.status(404).json({ error: 'Persona no encontrada' });
     }
   });
 
-// Levantamos el servidor en el puerto que configuramos
-app.listen(port, () => {
+  app.post('/persona', (req, res) => {
+    const { nombre, apellido, dni, fechaNacimiento, genero, donanteDeOrganos } = req.body;
+  
+    if (!nombre || !apellido || !dni || !fechaNacimiento || !genero || typeof donanteDeOrganos === 'undefined') {
+      res.status(400).json({ error: 'Faltan datos necesarios o incorrectos en la solicitud' });
+    }else{
+      const nuevaPersona = {
+        id: idPersona++, 
+        nombre,
+        apellido,
+        dni,
+        fechaNacimiento,
+        genero,
+        donanteDeOrganos,
+        autos: [] 
+      };
+    
+      personas.push(nuevaPersona); 
+      res.status(200).json({ id: nuevaPersona.id });  
+    }
+  });
+
+  app.delete('/persona/:id',(req,res) => {
+    const id = Number(req.params.id);
+    const personasFiltradas = personas.filter(p => p.id !== id);
+
+    if(personasFiltradas.length === personas.length){
+      res.json({error: "La personas que quiere eliminar no ha sido encontrada"});
+    } else {
+      personas = personasFiltradas;
+      res.json({mensaje: "Persona eliminada correctamente"});
+    }
+  });
+
+  app.listen(port, () => {
     console.log(`Example app listening on port ${port}`);
 });

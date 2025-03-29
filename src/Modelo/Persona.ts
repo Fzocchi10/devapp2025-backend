@@ -7,7 +7,7 @@ export enum Genero {
 }
 
 export interface Persona {
-    id: string,
+    id: number,
     nombre : string,
     apellido : string,
     dni : string,
