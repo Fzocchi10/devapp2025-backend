@@ -5,6 +5,7 @@ import bodyParser from 'body-parser';
 import helmet from 'helmet';
 import process from 'process';
 import { Genero, Persona } from './Modelo/Persona';
+import { Auto } from './Modelo/Auto';
 
 // Creamos nuestra app express
 const app = express();
@@ -17,31 +18,11 @@ app.use(cors());
 app.use(helmet());
 app.use(express.json());
 
-let idPersona = 2;
-let personas: Persona[] = [
-    {
-            id: 1,
-            nombre: 'Juan',
-            apellido: 'Perez',
-            dni: '20348784',
-            fechaNacimiento: new Date ('1980-10-20'),
-            genero: Genero.Masculino,
-            donanteDeOrganos: false,
-            autos:  [
-                {
-                    marca: 'Chevrolet',
-                    modelo: 'Corsa',
-                    año: 2010,
-                    patente: 'ARG010',
-                    color: 'Gris',
-                    numeroChasis: '87052',
-                    motor: 'FFAANN',
-                    dueñoId: '1',
-                    id: 1
-                }
-            ]
-        }
-];
+let idPersona = 1;
+let idAuto = 1;
+
+let autos: Auto[] = [];
+let personas: Persona[] = [];
 
 
 // Mis endpoints van acá
@@ -73,7 +54,7 @@ app.get('/persona/:id', (req, res) => {
   });
 
   app.put('/persona/:id', (req, res) => {
-    const  id = Number(req.params);
+    const  id = Number(req.params.id);
     const { nombre, apellido, dni, fechaNacimiento, genero, donanteDeOrganos } = req.body;
 
     //findIndex devuelve la posicion en la lista, si no existe devuelve menos 1
@@ -125,15 +106,124 @@ app.get('/persona/:id', (req, res) => {
   app.delete('/persona/:id',(req,res) => {
     const id = Number(req.params.id);
     const personasFiltradas = personas.filter(p => p.id !== id);
+    autos = autos.filter(auto => auto.dueñoId !== id);
 
     if(personasFiltradas.length === personas.length){
-      res.json({error: "La personas que quiere eliminar no ha sido encontrada"});
+      res.status(201).json({error: "La personas que quiere eliminar no ha sido encontrada"});
     } else {
       personas = personasFiltradas;
-      res.json({mensaje: "Persona eliminada correctamente"});
+      res.status(400).json({mensaje: "Persona eliminada correctamente"});
     }
   });
 
+
+//Endpoint Autos
+app.get('/autos',(req,res) => {
+  const listaDeAutos = autos.map(auto => ({
+    marca: auto.marca,
+    modelo:auto.modelo,
+    año:auto.año,
+    patente:auto.patente
+}));
+res.status(200).json(listaDeAutos);
+});
+
+app.get('/autos/:idPersona',(req,res) => {
+  const dueñoId = Number(req.params.idPersona);
+  const buscarDueño = personas.find(p => p.id === dueñoId);
+
+  if(buscarDueño){
+    res.status(200).json(buscarDueño.autos);
+  }
+  res.json({error:"No se ha encontrado un persona con ese id"});
+})
+
+app.get('/autos/:id',(req,res)=> {
+  const id = Number(req.params.id);
+    const auto = autos.find(a => a.id === id);
+
+    if (auto) {
+      res.status(200).json(auto);
+    } else {
+      res.status(404).json({ error: 'Auto no encontrado' });
+    }
+})
+
+app.put('/autos/:id',(req,res)=> {
+    const  id = Number(req.params.id);
+    const { marca, modelo, año, patente, color, numeroChasis, motor} = req.body;
+    const autoIndex = autos.findIndex(a => a.id === id);
+
+    if (autoIndex !== -1) {
+      const autoAct = autos[autoIndex];
+  
+      autos[autoIndex] = {
+        ...autoAct,
+        marca : marca ?? autoAct.marca,
+        modelo: modelo ?? autoAct.modelo,
+        año: año ?? autoAct.año,
+        patente: patente ?? autoAct.patente,
+        color: color ?? autoAct.color,
+        numeroChasis: numeroChasis ?? autoAct.numeroChasis,
+        motor: motor ?? autoAct.motor
+      };
+      res.status(201).json({ mensaje: 'Auto actualizado correctamente', auto: autos[autoIndex] });
+    } else {
+      res.status(404).json({ error: 'Auto no encontrado' });
+    }
+  });
+
+  app.post('/autos', (req, res) => {
+    const { marca, modelo, año, patente, color, numeroChasis, motor, dueñoId } = req.body;
+  
+    if (!marca || !modelo || !año || !patente || !color || !numeroChasis || !motor || !dueñoId) {
+      res.status(400).json({ error: 'Faltan datos necesarios o incorrectos en la solicitud' });
+    }
+  
+    const dueñoExistente = personas.find(p => p.id === dueñoId);
+  
+    if (!dueñoExistente) {
+      res.status(404).json({ error: 'El dueño con el ID proporcionado no existe' });
+    } else {
+  
+    const nuevoAuto = {
+      id: idAuto++, 
+      marca,
+      modelo,
+      año,
+      patente,
+      color,
+      numeroChasis,
+      motor,
+      dueñoId 
+    };
+  
+    autos.push(nuevoAuto);
+    dueñoExistente.autos = dueñoExistente.autos || [];  
+    dueñoExistente.autos.push(nuevoAuto)
+    res.status(200).json({ id: nuevoAuto.id });
+  }
+  });
+
+
+app.delete('/autos/:id',(req,res) => {
+  const id = Number(req.params.id);
+  const autosFiltrados = autos.filter(a => a.id !== id);
+  const persona = personas.find(p => p.autos.some(auto => auto.id === id));
+
+    if (persona) {
+    persona.autos = persona.autos.filter(auto => auto.id !== id);
+  }
+
+  if(autosFiltrados.length === autos.length){
+    res.status(200).json({error: "El auto que quiere eliminar no ha sido encontrado"});
+  } else {
+    autos = autosFiltrados;
+    res.status(400).json({mensaje: "Auto eliminado correctamente"});
+  }
+});
+
+app.get
   app.listen(port, () => {
     console.log(`Example app listening on port ${port}`);
 });

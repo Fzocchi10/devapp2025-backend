@@ -7,5 +7,5 @@ export interface Auto {
     color: string,
     numeroChasis: string,
     motor: string,
-    dueñoId: string;
+    dueñoId: number;
 }
