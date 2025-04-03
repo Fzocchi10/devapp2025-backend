@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { Persona } from "../Modelo/Persona";
+import { Genero, Persona } from "../Modelo/Persona";
 
 export let personas: Persona[] = [];
 export let idPersona=1;
@@ -31,29 +31,33 @@ export const getPersona = (req: Request, res: Response) => {
 export const postPersona = (req: Request, res: Response) => {
     const { nombre, apellido, dni, fechaNacimiento, genero, donanteDeOrganos } = req.body;
 
-    if (!nombre || !apellido || !dni || !fechaNacimiento || !genero || typeof donanteDeOrganos === 'undefined') {
-      res.status(400).json({ error: 'Faltan datos necesarios o incorrectos en la solicitud' });
-    } else {
-      const nuevaPersona = {
-        id: idPersona++,
-        nombre,
-        apellido,
-        dni,
-        fechaNacimiento,
-        genero,
-        donanteDeOrganos,
-        autos: []
-      };
+    if (!datosValidos(nombre,apellido,dni,fechaNacimiento,genero,donanteDeOrganos)) {
+      res.status(400).json({ error: 'Faltan datos necesarios o  hay datos incorrectos en la solicitud' });
+    }
+
+    const nuevaPersona = {
+      id: idPersona++,
+      nombre,
+      apellido,
+      dni,
+      fechaNacimiento: new Date(fechaNacimiento),
+      genero,
+      donanteDeOrganos,
+      autos: []
+    };
 
       personas.push(nuevaPersona);
       res.status(200).json({ id: nuevaPersona.id });
-    }
-};
+  }
 
 // Actualizar una persona
 export const putPersona = (req: Request, res: Response) => {
     const id = Number(req.params.id);
     const { nombre, apellido, dni, fechaNacimiento, genero, donanteDeOrganos } = req.body;
+
+    if (!datosValidosSiEstaPresente(nombre,apellido,dni,fechaNacimiento,genero,donanteDeOrganos)) {
+      res.status(400).json({ error: 'Faltan datos necesarios o  hay datos incorrectos en la solicitud' });
+    }
 
     const personaIndex = personas.findIndex(p => p.id === id);
 
@@ -86,3 +90,30 @@ export const deletePersona = (req: Request, res: Response) => {
       res.status(200).json({ mensaje: 'Persona eliminada correctamente' });
     }
 };
+
+export const datosValidos = (
+  nombre: string, apellido: string, dni: string, fechaNacimiento: string, genero: Genero, donanteDeOrganos: boolean
+): boolean => {
+  return (
+    typeof nombre === 'string'  &&
+    typeof apellido === 'string' &&
+    typeof dni === 'string' && dni.trim().length > 0 &&
+    !isNaN(new Date(fechaNacimiento).getTime()) && new Date(fechaNacimiento) <= new Date() &&
+    Object.values(Genero).includes(genero) &&
+    typeof donanteDeOrganos === 'boolean'
+  );
+}
+
+export const datosValidosSiEstaPresente = (
+  nombre?: string, apellido?: string, dni?: string, fechaNacimiento?: string, genero?: Genero, donanteDeOrganos?: boolean
+): boolean => {
+
+  return (
+    (nombre ? (typeof nombre === 'string') : true) &&
+    (apellido ? (typeof apellido === 'string') : true) &&
+    (dni ? (typeof dni === 'string' && dni.trim().length > 0) : true) &&
+    (fechaNacimiento ? (!isNaN(new Date(fechaNacimiento).getTime()) && new Date(fechaNacimiento) <= new Date()) : true) &&
+    (genero ? Object.values(Genero).includes(genero) : true) &&
+    (donanteDeOrganos !== undefined ? typeof donanteDeOrganos === 'boolean' : true)
+  );
+}
