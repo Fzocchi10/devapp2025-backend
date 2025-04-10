@@ -32,22 +32,22 @@ export const postPersona = (req: Request, res: Response) => {
     const { nombre, apellido, dni, fechaNacimiento, genero, donanteDeOrganos } = req.body;
 
     if (!datosValidos(nombre,apellido,dni,fechaNacimiento,genero,donanteDeOrganos)) {
-      res.status(400).json({ error: 'Faltan datos necesarios o  hay datos incorrectos en la solicitud' });
+       res.status(400).json({ error: 'Faltan datos necesarios o  hay datos incorrectos en la solicitud' });
+    } else {
+      const nuevaPersona = {
+        id: idPersona++,
+        nombre,
+        apellido,
+        dni,
+        fechaNacimiento: new Date(fechaNacimiento),
+        genero,
+        donanteDeOrganos,
+        autos: []
+      };
+
+        personas.push(nuevaPersona);
+        res.status(200).json({ id: nuevaPersona.id });
     }
-
-    const nuevaPersona = {
-      id: idPersona++,
-      nombre,
-      apellido,
-      dni,
-      fechaNacimiento: new Date(fechaNacimiento),
-      genero,
-      donanteDeOrganos,
-      autos: []
-    };
-
-      personas.push(nuevaPersona);
-      res.status(200).json({ id: nuevaPersona.id });
   }
 
 // Actualizar una persona
