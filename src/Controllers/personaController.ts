@@ -27,6 +27,17 @@ export const getPersona = (req: Request, res: Response) => {
     }
 };
 
+export const getAuto = (req: Request, res: Response) => {
+  const id = Number(req.params.id);
+  const persona = personas.find(p => p.id === id);
+
+  if (persona) {
+    res.status(200).json(persona.autos);
+  } else {
+    res.status(404).json({ error: 'Persona no encontrada' });
+  }
+};
+
 // Crear una nueva persona
 export const postPersona = (req: Request, res: Response) => {
     const { nombre, apellido, dni, fechaNacimiento, genero, donanteDeOrganos } = req.body;
