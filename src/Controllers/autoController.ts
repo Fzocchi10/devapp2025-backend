@@ -13,9 +13,6 @@ export const getAutos = (req: Request, res: Response) => {
         modelo: auto.modelo,
         año: auto.año,
         patente: auto.patente,
-        color: auto.color,
-        motor: auto.motor,
-        numeroChasis: auto.numeroChasis,
     }));
     res.status(200).json(listaDeAutos);
 };
@@ -36,8 +33,8 @@ export const getAuto = (req: Request, res: Response) => {
 export const postAuto = (req: Request, res: Response) => {
     const { marca, modelo, año, patente, color, numeroChasis, motor, dueñoId } = req.body;
 
-    if (!marca || !modelo || !año || !patente || !color || !numeroChasis || !motor || !dueñoId) {
-        res.status(400).json({ error: 'Faltan datos necesarios o incorrectos en la solicitud' });
+    if (!datosValidos(marca, modelo, año, patente, color, numeroChasis, motor, dueñoId)) {
+        res.status(400).json({ error: 'Faltan datos necesarios o hay datos incorrectos en la solicitud' });
         return;
     }
     const dueñoExistente = personas.find(p => p.id === dueñoId);
@@ -70,6 +67,11 @@ export const postAuto = (req: Request, res: Response) => {
 export const putAuto = (req: Request, res: Response) => {
     const id = Number(req.params.id);
     const { marca, modelo, año, patente, color, numeroChasis, motor } = req.body;
+
+    if (!datosValidos(marca, modelo, año, patente, color, numeroChasis, motor, id)) {
+        res.status(400).json({ error: 'Hay datos incorrectos en la solicitud' });
+        return;
+    }
 
     const autoIndex = autos.findIndex(a => a.id === id);
 
@@ -108,3 +110,33 @@ export const deleteAuto = (req: Request, res: Response) => {
         res.status(200).json({ mensaje: 'Auto eliminado correctamente' });
     }
 };
+
+export const datosValidos = (
+    marca: string, modelo : string, año: number, patente : string, color: string, numeroChasis: string, motor: string, dueñoId: number
+) : boolean => {
+    return (
+        typeof marca == 'string' &&
+        typeof modelo == 'string' &&
+        typeof año == 'number' &&
+        typeof patente == 'string' &&
+        typeof color == 'string' &&
+        typeof numeroChasis == 'string' &&
+        typeof motor == 'string' &&
+        typeof dueñoId == 'number'
+    )
+}
+
+export const datosValidosSiEstaPresente = (
+    marca: string, modelo : string, año: number, patente : string, color: string, numeroChasis: string, motor: string, dueñoId : number
+) => {
+    return(
+        (marca ? (typeof marca == 'string') : true) &&
+        (modelo ? (typeof modelo == 'string') : true) &&
+        (año ? (typeof año == 'number') : true) &&
+        (patente ? (typeof patente == 'string') : true) &&
+        (color ? (typeof color == 'string') : true) &&
+        (numeroChasis ? (typeof numeroChasis == 'string') : true) &&
+        (motor ? (typeof motor == 'string') : true) &&
+        (dueñoId ? (typeof dueñoId == 'number') : true)
+    )
+}
