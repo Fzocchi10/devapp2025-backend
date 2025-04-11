@@ -27,12 +27,21 @@ export const getPersona = (req: Request, res: Response) => {
     }
 };
 
-export const getAuto = (req: Request, res: Response) => {
+export const getAutosDeLaPersona = (req: Request, res: Response) => {
   const id = Number(req.params.id);
   const persona = personas.find(p => p.id === id);
+  const listaDeAutos = persona?.autos
+
+  const autos = listaDeAutos?.map(auto => ({
+    id: auto.id,
+    patente: auto.patente,
+    marca: auto.marca,
+    modelo: auto.modelo,
+    año: auto.año
+}));
 
   if (persona) {
-    res.status(200).json(persona.autos);
+    res.status(200).json(autos);
   } else {
     res.status(404).json({ error: 'Persona no encontrada' });
   }

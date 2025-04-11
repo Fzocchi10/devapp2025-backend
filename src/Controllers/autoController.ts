@@ -32,35 +32,34 @@ export const getAuto = (req: Request, res: Response) => {
 // Crear un nuevo auto
 export const postAuto = (req: Request, res: Response) => {
     const { marca, modelo, año, patente, color, numeroChasis, motor, dueñoId } = req.body;
+    const dueñoExistente = personas.find(p => p.id === dueñoId);
 
     if (!datosValidos(marca, modelo, año, patente, color, numeroChasis, motor, dueñoId)) {
         res.status(400).json({ error: 'Faltan datos necesarios o hay datos incorrectos en la solicitud' });
-        return;
-    }
-    const dueñoExistente = personas.find(p => p.id === dueñoId);
-
-    if (!dueñoExistente) {
+    } else if (!dueñoExistente) {
         res.status(404).json({ error: 'El dueño con el ID proporcionado no existe' });
-        return;
+    } else {
+        const nuevoAuto = {
+            id: idAuto++,
+            marca,
+            modelo,
+            año,
+            patente,
+            color,
+            numeroChasis,
+            motor,
+            dueñoId
+        };
+
+        autos.push(nuevoAuto);
+        dueñoExistente.autos = dueñoExistente.autos || [];
+        dueñoExistente.autos.push(nuevoAuto);
+
+        res.status(200).json({ id: nuevoAuto.id });
+
     }
 
-    const nuevoAuto = {
-        id: idAuto++,
-        marca,
-        modelo,
-        año,
-        patente,
-        color,
-        numeroChasis,
-        motor,
-        dueñoId
-    };
 
-    autos.push(nuevoAuto);
-    dueñoExistente.autos = dueñoExistente.autos || [];
-    dueñoExistente.autos.push(nuevoAuto);
-
-    res.status(200).json({ id: nuevoAuto.id });
 };
 
 // Actualizar un auto
