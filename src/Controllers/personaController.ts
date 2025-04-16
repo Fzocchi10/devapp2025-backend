@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { Genero, Persona } from "../Modelo/Persona";
+import { autos } from "./autoController";
 
 export let personas: Persona[] = [];
 export let idPersona=1;
@@ -77,24 +78,24 @@ export const putPersona = (req: Request, res: Response) => {
 
     if (!datosValidosSiEstaPresente(nombre,apellido,dni,fechaNacimiento,genero,donanteDeOrganos)) {
       res.status(400).json({ error: 'Faltan datos necesarios o  hay datos incorrectos en la solicitud' });
-    }
-
-    const personaIndex = personas.findIndex(p => p.id === id);
-
-    if (personaIndex !== -1) {
-      const personaAct = personas[personaIndex];
-      personas[personaIndex] = {
-        ...personaAct,
-        nombre: nombre ?? personaAct.nombre,
-        apellido: apellido ?? personaAct.apellido,
-        dni: dni ?? personaAct.dni,
-        fechaNacimiento: fechaNacimiento ?? personaAct.fechaNacimiento,
-        genero: genero ?? personaAct.genero,
-        donanteDeOrganos: donanteDeOrganos ?? personaAct.donanteDeOrganos,
-      };
-      res.status(201).json({ mensaje: 'Persona actualizada correctamente', persona: personas[personaIndex] });
     } else {
-      res.status(404).json({ error: 'Persona no encontrada' });
+      const personaIndex = personas.findIndex(p => p.id === id);
+
+      if (personaIndex !== -1) {
+        const personaAct = personas[personaIndex];
+        personas[personaIndex] = {
+          ...personaAct,
+          nombre: nombre ?? personaAct.nombre,
+          apellido: apellido ?? personaAct.apellido,
+          dni: dni ?? personaAct.dni,
+          fechaNacimiento: fechaNacimiento ?? personaAct.fechaNacimiento,
+          genero: genero ?? personaAct.genero,
+          donanteDeOrganos: donanteDeOrganos ?? personaAct.donanteDeOrganos,
+        };
+        res.status(201).json({ mensaje: 'Persona actualizada correctamente', persona: personas[personaIndex].id, fecha : typeof fechaNacimiento });
+      } else {
+        res.status(404).json({ error: 'Persona no encontrada' });
+      }
     }
 };
 
@@ -102,10 +103,13 @@ export const putPersona = (req: Request, res: Response) => {
 export const deletePersona = (req: Request, res: Response) => {
     const id = Number(req.params.id);
     const personasFiltradas = personas.filter(p => p.id !== id);
+    const autosFiltrados = autos.filter(a => a.dueñoId !== id);
 
     if (personasFiltradas.length === personas.length) {
       res.status(404).json({ error: 'La persona que quiere eliminar no ha sido encontrada' });
     } else {
+      autos.length = 0;
+      autos.push(...autosFiltrados);
       personas = personasFiltradas;
       res.status(200).json({ mensaje: 'Persona eliminada correctamente' });
     }

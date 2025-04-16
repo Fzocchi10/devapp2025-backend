@@ -21,9 +21,20 @@ export const getAutos = (req: Request, res: Response) => {
 export const getAuto = (req: Request, res: Response) => {
     const id = Number(req.params.id);
     const auto = autos.find(a => a.id === id);
+    const persona = personas.find(p => p.id == auto?.dueñoId)
 
     if (auto) {
-        res.status(200).json(auto);
+        res.status(200).json(
+        {
+            "marca": auto.marca,
+            "modelo": auto.modelo,
+            "patente": auto.patente,
+            "año": auto.año,
+            "color": auto.color,
+            "motor": auto.motor,
+            "numeroChasis": auto.numeroChasis,
+            "dueño": persona?.apellido + " " + persona?.nombre
+        });
     } else {
         res.status(404).json({ error: 'Auto no encontrado' });
     }
@@ -98,14 +109,11 @@ export const deleteAuto = (req: Request, res: Response) => {
     const autosFiltrados = autos.filter(a => a.id !== id);
     const persona = personas.find(p => p.autos.some(auto => auto.id === id));
 
-    if (persona) {
-        persona.autos = persona.autos.filter(auto => auto.id !== id);
-    }
-
-    if (autosFiltrados.length === autos.length) {
+    if (autosFiltrados.length === autos.length || !persona) {
         res.status(404).json({ error: 'El auto que quiere eliminar no ha sido encontrado' });
     } else {
         autos = autosFiltrados;
+        persona.autos = persona.autos.filter(auto => auto.id !== id);
         res.status(200).json({ mensaje: 'Auto eliminado correctamente' });
     }
 };
