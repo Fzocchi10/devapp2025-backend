@@ -77,15 +77,11 @@ export const postAuto = (req: Request, res: Response) => {
 export const putAuto = (req: Request, res: Response) => {
     const id = Number(req.params.id);
     const { marca, modelo, año, patente, color, numeroChasis, motor } = req.body;
-
-    if (!datosValidos(marca, modelo, año, patente, color, numeroChasis, motor, id)) {
-        res.status(400).json({ error: 'Hay datos incorrectos en la solicitud' });
-        return;
-    }
-
     const autoIndex = autos.findIndex(a => a.id === id);
 
-    if (autoIndex !== -1) {
+    if (!datosValidosSiEstaPresente(marca, modelo, año, patente, color, numeroChasis, motor, id)) {
+        res.status(400).json({ error: 'Hay datos incorrectos en la solicitud' });
+    } else if (autoIndex !== -1){
         const autoAct = autos[autoIndex];
         autos[autoIndex] = {
             ...autoAct,
@@ -97,7 +93,7 @@ export const putAuto = (req: Request, res: Response) => {
             numeroChasis: numeroChasis ?? autoAct.numeroChasis,
             motor: motor ?? autoAct.motor,
         };
-        res.status(200).json({ mensaje: 'Auto actualizado correctamente', auto: autos[autoIndex] });
+        res.status(200).json({ mensaje: 'Auto actualizado correctamente', auto: autos[autoIndex].id });
     } else {
         res.status(404).json({ error: 'Auto no encontrado' });
     }
