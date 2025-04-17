@@ -13,9 +13,6 @@ export const getAutos = (req: Request, res: Response) => {
         modelo: auto.modelo,
         año: auto.año,
         patente: auto.patente,
-        color: auto.color,
-        motor: auto.motor,
-        numeroChasis: auto.numeroChasis,
     }));
     res.status(200).json(listaDeAutos);
 };
@@ -24,9 +21,20 @@ export const getAutos = (req: Request, res: Response) => {
 export const getAuto = (req: Request, res: Response) => {
     const id = Number(req.params.id);
     const auto = autos.find(a => a.id === id);
+    const persona = personas.find(p => p.id == auto?.dueñoId)
 
     if (auto) {
-        res.status(200).json(auto);
+        res.status(200).json(
+        {
+            "marca": auto.marca,
+            "modelo": auto.modelo,
+            "patente": auto.patente,
+            "año": auto.año,
+            "color": auto.color,
+            "motor": auto.motor,
+            "numeroChasis": auto.numeroChasis,
+            "dueño": persona?.apellido + " " + persona?.nombre
+        });
     } else {
         res.status(404).json({ error: 'Auto no encontrado' });
     }
@@ -35,45 +43,45 @@ export const getAuto = (req: Request, res: Response) => {
 // Crear un nuevo auto
 export const postAuto = (req: Request, res: Response) => {
     const { marca, modelo, año, patente, color, numeroChasis, motor, dueñoId } = req.body;
-
-    if (!marca || !modelo || !año || !patente || !color || !numeroChasis || !motor || !dueñoId) {
-        res.status(400).json({ error: 'Faltan datos necesarios o incorrectos en la solicitud' });
-        return;
-    }
     const dueñoExistente = personas.find(p => p.id === dueñoId);
 
-    if (!dueñoExistente) {
+    if (!datosValidos(marca, modelo, año, patente, color, numeroChasis, motor, dueñoId)) {
+        res.status(400).json({ error: 'Faltan datos necesarios o hay datos incorrectos en la solicitud' });
+    } else if (!dueñoExistente) {
         res.status(404).json({ error: 'El dueño con el ID proporcionado no existe' });
-        return;
+    } else {
+        const nuevoAuto = {
+            id: idAuto++,
+            marca,
+            modelo,
+            año,
+            patente,
+            color,
+            numeroChasis,
+            motor,
+            dueñoId
+        };
+
+        autos.push(nuevoAuto);
+        dueñoExistente.autos = dueñoExistente.autos || [];
+        dueñoExistente.autos.push(nuevoAuto);
+
+        res.status(200).json({ id: nuevoAuto.id });
+
     }
 
-    const nuevoAuto = {
-        id: idAuto++,
-        marca,
-        modelo,
-        año,
-        patente,
-        color,
-        numeroChasis,
-        motor,
-        dueñoId
-    };
 
-    autos.push(nuevoAuto);
-    dueñoExistente.autos = dueñoExistente.autos || [];
-    dueñoExistente.autos.push(nuevoAuto);
-
-    res.status(200).json({ id: nuevoAuto.id });
 };
 
 // Actualizar un auto
 export const putAuto = (req: Request, res: Response) => {
     const id = Number(req.params.id);
     const { marca, modelo, año, patente, color, numeroChasis, motor } = req.body;
-
     const autoIndex = autos.findIndex(a => a.id === id);
 
-    if (autoIndex !== -1) {
+    if (!datosValidosSiEstaPresente(marca, modelo, año, patente, color, numeroChasis, motor, id)) {
+        res.status(400).json({ error: 'Hay datos incorrectos en la solicitud' });
+    } else if (autoIndex !== -1){
         const autoAct = autos[autoIndex];
         autos[autoIndex] = {
             ...autoAct,
@@ -85,7 +93,7 @@ export const putAuto = (req: Request, res: Response) => {
             numeroChasis: numeroChasis ?? autoAct.numeroChasis,
             motor: motor ?? autoAct.motor,
         };
-        res.status(200).json({ mensaje: 'Auto actualizado correctamente', auto: autos[autoIndex] });
+        res.status(200).json({ mensaje: 'Auto actualizado correctamente', auto: autos[autoIndex].id });
     } else {
         res.status(404).json({ error: 'Auto no encontrado' });
     }
@@ -97,14 +105,41 @@ export const deleteAuto = (req: Request, res: Response) => {
     const autosFiltrados = autos.filter(a => a.id !== id);
     const persona = personas.find(p => p.autos.some(auto => auto.id === id));
 
-    if (persona) {
-        persona.autos = persona.autos.filter(auto => auto.id !== id);
-    }
-
-    if (autosFiltrados.length === autos.length) {
+    if (autosFiltrados.length === autos.length || !persona) {
         res.status(404).json({ error: 'El auto que quiere eliminar no ha sido encontrado' });
     } else {
         autos = autosFiltrados;
+        persona.autos = persona.autos.filter(auto => auto.id !== id);
         res.status(200).json({ mensaje: 'Auto eliminado correctamente' });
     }
 };
+
+export const datosValidos = (
+    marca: string, modelo : string, año: number, patente : string, color: string, numeroChasis: string, motor: string, dueñoId: number
+) : boolean => {
+    return (
+        typeof marca == 'string' &&
+        typeof modelo == 'string' &&
+        typeof año == 'number' &&
+        typeof patente == 'string' &&
+        typeof color == 'string' &&
+        typeof numeroChasis == 'string' &&
+        typeof motor == 'string' &&
+        typeof dueñoId == 'number'
+    )
+}
+
+export const datosValidosSiEstaPresente = (
+    marca: string, modelo : string, año: number, patente : string, color: string, numeroChasis: string, motor: string, dueñoId : number
+) => {
+    return(
+        (marca ? (typeof marca == 'string') : true) &&
+        (modelo ? (typeof modelo == 'string') : true) &&
+        (año ? (typeof año == 'number') : true) &&
+        (patente ? (typeof patente == 'string') : true) &&
+        (color ? (typeof color == 'string') : true) &&
+        (numeroChasis ? (typeof numeroChasis == 'string') : true) &&
+        (motor ? (typeof motor == 'string') : true) &&
+        (dueñoId ? (typeof dueñoId == 'number') : true)
+    )
+}
