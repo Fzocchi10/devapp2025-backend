@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { Auto } from "../Modelo/Auto";
 import { personas } from "../Controllers/personaController";
+import { Persona } from "../Modelo/Persona";
 
 export let autos: Auto[] = [];
 export let idAuto = 1;
@@ -19,25 +20,20 @@ export const getAutos = (req: Request, res: Response) => {
 
 // Obtener un auto por ID
 export const getAuto = (req: Request, res: Response) => {
-    const id = Number(req.params.id);
-    const auto = autos.find(a => a.id === id);
-    const persona = personas.find(p => p.id == auto?.dueñoId)
+    const auto = (req as any).auto as Auto;
+    const dueñoExistente = (req as any).persona as Persona;
 
-    if (auto) {
-        res.status(200).json(
-        {
-            "marca": auto.marca,
-            "modelo": auto.modelo,
-            "patente": auto.patente,
-            "año": auto.año,
-            "color": auto.color,
-            "motor": auto.motor,
-            "numeroChasis": auto.numeroChasis,
-            "dueño": persona?.apellido + " " + persona?.nombre
-        });
-    } else {
-        res.status(404).json({ error: 'Auto no encontrado' });
-    }
+    res.status(200).json(
+    {
+        "marca": auto.marca,
+        "modelo": auto.modelo,
+        "patente": auto.patente,
+        "año": auto.año,
+        "color": auto.color,
+        "motor": auto.motor,
+        "numeroChasis": auto.numeroChasis,
+        "dueño": dueñoExistente.apellido + " " + dueñoExistente.nombre
+    });
 };
 
 // Crear un nuevo auto
@@ -45,9 +41,7 @@ export const postAuto = (req: Request, res: Response) => {
     const { marca, modelo, año, patente, color, numeroChasis, motor, dueñoId } = req.body;
     const dueñoExistente = personas.find(p => p.id === dueñoId);
 
-    if (!datosValidos(marca, modelo, año, patente, color, numeroChasis, motor, dueñoId)) {
-        res.status(400).json({ error: 'Faltan datos necesarios o hay datos incorrectos en la solicitud' });
-    } else if (!dueñoExistente) {
+    if (!dueñoExistente) {
         res.status(404).json({ error: 'El dueño con el ID proporcionado no existe' });
     } else {
         const nuevoAuto = {
@@ -69,8 +63,6 @@ export const postAuto = (req: Request, res: Response) => {
         res.status(200).json({ id: nuevoAuto.id });
 
     }
-
-
 };
 
 // Actualizar un auto
@@ -79,9 +71,7 @@ export const putAuto = (req: Request, res: Response) => {
     const { marca, modelo, año, patente, color, numeroChasis, motor } = req.body;
     const autoIndex = autos.findIndex(a => a.id === id);
 
-    if (!datosValidosSiEstaPresente(marca, modelo, año, patente, color, numeroChasis, motor, id)) {
-        res.status(400).json({ error: 'Hay datos incorrectos en la solicitud' });
-    } else if (autoIndex !== -1){
+    if (autoIndex !== -1){
         const autoAct = autos[autoIndex];
         autos[autoIndex] = {
             ...autoAct,
@@ -114,32 +104,3 @@ export const deleteAuto = (req: Request, res: Response) => {
     }
 };
 
-export const datosValidos = (
-    marca: string, modelo : string, año: number, patente : string, color: string, numeroChasis: string, motor: string, dueñoId: number
-) : boolean => {
-    return (
-        typeof marca == 'string' &&
-        typeof modelo == 'string' &&
-        typeof año == 'number' &&
-        typeof patente == 'string' &&
-        typeof color == 'string' &&
-        typeof numeroChasis == 'string' &&
-        typeof motor == 'string' &&
-        typeof dueñoId == 'number'
-    )
-}
-
-export const datosValidosSiEstaPresente = (
-    marca: string, modelo : string, año: number, patente : string, color: string, numeroChasis: string, motor: string, dueñoId : number
-) => {
-    return(
-        (marca ? (typeof marca == 'string') : true) &&
-        (modelo ? (typeof modelo == 'string') : true) &&
-        (año ? (typeof año == 'number') : true) &&
-        (patente ? (typeof patente == 'string') : true) &&
-        (color ? (typeof color == 'string') : true) &&
-        (numeroChasis ? (typeof numeroChasis == 'string') : true) &&
-        (motor ? (typeof motor == 'string') : true) &&
-        (dueñoId ? (typeof dueñoId == 'number') : true)
-    )
-}
