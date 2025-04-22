@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { Auto } from "../Modelo/Auto";
 import { personas } from "../Controllers/personaController";
-import { Persona } from "../Modelo/Persona";
 
 export let autos: Auto[] = [];
 export let idAuto = 1;
@@ -21,7 +20,7 @@ export const getAutos = (req: Request, res: Response) => {
 // Obtener un auto por ID
 export const getAuto = (req: Request, res: Response) => {
     const auto = (req as any).auto as Auto;
-    const dueñoExistente = (req as any).persona as Persona;
+    const persona = personas.find(p => p.id == auto?.dueñoId)
 
     res.status(200).json(
     {
@@ -32,37 +31,33 @@ export const getAuto = (req: Request, res: Response) => {
         "color": auto.color,
         "motor": auto.motor,
         "numeroChasis": auto.numeroChasis,
-        "dueño": dueñoExistente.apellido + " " + dueñoExistente.nombre
+        "dueño": persona?.apellido + " " + persona?.nombre
     });
 };
 
 // Crear un nuevo auto
 export const postAuto = (req: Request, res: Response) => {
     const { marca, modelo, año, patente, color, numeroChasis, motor, dueñoId } = req.body;
-    const dueñoExistente = personas.find(p => p.id === dueñoId);
+    const dueñoExistente = (req as any).dueño;
 
-    if (!dueñoExistente) {
-        res.status(404).json({ error: 'El dueño con el ID proporcionado no existe' });
-    } else {
-        const nuevoAuto = {
-            id: idAuto++,
-            marca,
-            modelo,
-            año,
-            patente,
-            color,
-            numeroChasis,
-            motor,
-            dueñoId
-        };
+    const nuevoAuto = {
+        id: idAuto++,
+        marca,
+        modelo,
+        año,
+        patente,
+        color,
+        numeroChasis,
+        motor,
+        dueñoId
+    };
 
-        autos.push(nuevoAuto);
-        dueñoExistente.autos = dueñoExistente.autos || [];
-        dueñoExistente.autos.push(nuevoAuto);
+    autos.push(nuevoAuto);
+    dueñoExistente.autos = dueñoExistente.autos || [];
+    dueñoExistente.autos.push(nuevoAuto);
 
-        res.status(200).json({ id: nuevoAuto.id });
+    res.status(200).json({ id: nuevoAuto.id });
 
-    }
 };
 
 // Actualizar un auto
@@ -84,8 +79,6 @@ export const putAuto = (req: Request, res: Response) => {
             motor: motor ?? autoAct.motor,
         };
         res.status(200).json({ mensaje: 'Auto actualizado correctamente', auto: autos[autoIndex].id });
-    } else {
-        res.status(404).json({ error: 'Auto no encontrado' });
     }
 };
 
