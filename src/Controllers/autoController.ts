@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import { Auto } from "../Modelo/Auto";
 import { personas } from "../Controllers/personaController";
+import { randomUUID, UUID } from "crypto";
 
 export let autos: Auto[] = [];
-export let idAuto = 1;
 
 // Obtener todos los autos
 export const getAutos = (req: Request, res: Response) => {
@@ -41,7 +41,7 @@ export const postAuto = (req: Request, res: Response) => {
     const dueñoExistente = (req as any).dueño;
 
     const nuevoAuto = {
-        id: idAuto++,
+        id: randomUUID(),
         marca,
         modelo,
         año,
@@ -62,7 +62,7 @@ export const postAuto = (req: Request, res: Response) => {
 
 // Actualizar un auto
 export const putAuto = (req: Request, res: Response) => {
-    const id = Number(req.params.id);
+    const id = (req.params.id) as UUID;
     const { marca, modelo, año, patente, color, numeroChasis, motor } = req.body;
     const autoIndex = autos.findIndex(a => a.id === id);
 
@@ -84,7 +84,7 @@ export const putAuto = (req: Request, res: Response) => {
 
 // Eliminar un auto
 export const deleteAuto = (req: Request, res: Response) => {
-    const id = Number(req.params.id);
+    const id = req.params.id as UUID;
     const autosFiltrados = autos.filter(a => a.id !== id);
     const persona = personas.find(p => p.autos.some(auto => auto.id === id));
 

@@ -1,8 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import { personas } from "../Controllers/personaController";
+import { UUID } from "crypto";
 
 export const verificarPersonaExiste = (req: Request, res: Response, next: NextFunction): void => {
-    const id = Number(req.params.id);
+    const id = req.params.id as UUID;
     const persona = personas.find(p => p.id === id);
 
     if (!persona) {

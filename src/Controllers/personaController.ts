@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import { Persona } from "../Modelo/Persona";
 import { autos } from "./autoController";
+import { randomUUID, UUID } from "crypto";
 
 export let personas: Persona[] = [];
-export let idPersona=1;
 
 // Obtener todas las personas
 export const getPersonas = (req: Request, res: Response) => {
@@ -41,7 +41,7 @@ export const postPersona = (req: Request, res: Response) => {
   const { nombre, apellido, dni, fechaNacimiento, genero, donanteDeOrganos } = req.body;
 
   const nuevaPersona = {
-    id: idPersona++,
+    id: randomUUID(),
     nombre,
     apellido,
     dni,
@@ -57,7 +57,7 @@ export const postPersona = (req: Request, res: Response) => {
 
 // Actualizar una persona
 export const putPersona = (req: Request, res: Response) => {
-    const id = Number(req.params.id);
+    const id = req.params.id as UUID;
     const { nombre, apellido, dni, fechaNacimiento, genero, donanteDeOrganos } = req.body;
 
     const personaIndex = personas.findIndex(p => p.id === id);

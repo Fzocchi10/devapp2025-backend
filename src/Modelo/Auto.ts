@@ -1,5 +1,7 @@
+import { UUID } from "crypto";
+
 export interface Auto {
-    id: number,
+    id: UUID,
     marca: string,
     modelo : string,
     año: number,
@@ -7,5 +9,5 @@ export interface Auto {
     color: string,
     numeroChasis: string,
     motor: string,
-    dueñoId: number;
+    dueñoId: UUID;
 }

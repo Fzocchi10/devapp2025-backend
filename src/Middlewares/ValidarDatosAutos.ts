@@ -11,7 +11,7 @@ export const validarDatosAutos = (req: Request, res: Response, next: NextFunctio
         typeof color == 'string' &&
         typeof numeroChasis == 'string' &&
         typeof motor == 'string' &&
-        typeof dueñoId == 'number'
+        typeof dueñoId == 'string'
 
     if (!datosValidos) {
         res.status(400).json({ error: 'Faltan datos necesarios o hay datos incorrectos en la solicitud' });
@@ -32,7 +32,7 @@ export const validarDatosAutoExistentes = (req: Request,res: Response, next: Nex
     (color ? (typeof color == 'string') : true) &&
     (numeroChasis ? (typeof numeroChasis == 'string') : true) &&
     (motor ? (typeof motor == 'string') : true) &&
-    (dueñoId ? (typeof dueñoId == 'number') : true);
+    (dueñoId ? (typeof dueñoId == 'string') : true);
 
     if(!datosValidos){
         res.status(400).json({ error: 'Faltan datos o hay datos incorrectos'});
