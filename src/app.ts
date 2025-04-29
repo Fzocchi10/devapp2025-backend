@@ -7,7 +7,12 @@ import autoRutas from './Rutas/autosRutas';
 
 const app = express();
 
-app.use(cors({origin: 'https://devapp2025-frontend-production.up.railway.app'}));
+const corsFrontend = {
+  origin: "devapp2025-frontend-production.up.railway.app",
+};
+
+
+app.use(cors(corsFrontend));
 app.use(helmet());
 app.use(express.json());
 
