@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
-import { personas } from "../Controllers/personaController";
+import { personaService } from "../inyeccion";
 
 export const verificarDueñoExiste = (req: Request, res: Response, next: NextFunction) => {
-    const dueñoExistente = personas.find(p => p.id === req.body.dueñoId);
+    const dueñoExistente = personaService.getById(req.body.id);
 
     if(!dueñoExistente) {
         res.status(404).json({ error: 'Dueño no encontrado' });
