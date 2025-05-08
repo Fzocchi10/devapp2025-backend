@@ -1,3 +1,4 @@
+import { Auto } from "../Modelo/Auto";
 import { Persona } from "../Modelo/Persona";
 
 export interface PersonaRepository {
@@ -6,4 +7,6 @@ export interface PersonaRepository {
   create(data: Omit<Persona, "id" | "autos">): Promise<Persona>;
   update(id: string, data: Partial<Persona>): Promise<Persona | null>;
   delete(id: string): Promise<void>;
+  addAuto(id: string, auto:Auto):Promise<void>;
+  getAutosById(id:string): Promise<Auto[]>;
 }

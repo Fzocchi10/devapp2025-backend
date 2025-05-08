@@ -9,7 +9,8 @@ export class memoryAutoRepository implements AutoRepository{
         return autosEnMemoria;
     }
     async getById(id: string): Promise<Auto | null> {
-        return autosEnMemoria.find(auto => auto.id === id) || null;
+        const auto = autosEnMemoria.find(auto => auto.id === id);
+        return auto || null;
     }
     async create(idDuenio: UUID, data: Omit<Auto, "id" | "dueñoId">): Promise<Auto> {
         const nuevoAuto: Auto = {
@@ -17,6 +18,7 @@ export class memoryAutoRepository implements AutoRepository{
             id: randomUUID(),
             dueñoId: idDuenio
         }
+
         autosEnMemoria.push(nuevoAuto);
         return nuevoAuto;
     }
@@ -37,5 +39,5 @@ export class memoryAutoRepository implements AutoRepository{
         autosEnMemoria = autosEnMemoria.filter(a => a.id !== id);
 
     }
-    
+
 }

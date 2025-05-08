@@ -2,6 +2,7 @@ import { PersonaRepository } from "../Repositories/personaRepository";
 import { Persona } from "../Modelo/Persona";
 import { mongoPersonaRepository } from "../Repositories/mongo/mongoPersonaRepository";
 import { memoryPersonaRepository } from "../Repositories/memory/memoryPersonaRepository";
+import { Auto } from "../Modelo/Auto";
 
 export class PersonaService {
   private repository: PersonaRepository;
@@ -29,5 +30,13 @@ export class PersonaService {
 
   delete(id: string): Promise<void> {
     return this.repository.delete(id);
+  }
+
+  addAuto(id:string, auto: Auto): Promise<void>{
+    return this.repository.addAuto(id,auto);
+  }
+
+  autosById(id:string): Promise<Auto[]>{
+    return this.repository.getAutosById(id);
   }
 }

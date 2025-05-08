@@ -1,7 +1,14 @@
+import { Auto } from "../../Modelo/Auto";
 import { Persona } from "../../Modelo/Persona";
 import { PersonaRepository } from "../personaRepository";
 
 export class mongoPersonaRepository implements PersonaRepository {
+    getAutosById(id: string): Promise<Auto[]> {
+        throw new Error("Method not implemented.");
+    }
+    addAuto(id: string, auto: Auto): Promise<void> {
+        throw new Error("Method not implemented.");
+    }
     getAll(): Promise<Persona[]> {
         throw new Error("Method not implemented.");
     }

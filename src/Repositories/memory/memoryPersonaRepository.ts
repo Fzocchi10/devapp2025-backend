@@ -1,11 +1,32 @@
-import { Persona } from "../../Modelo/Persona";
+import { Auto } from "../../Modelo/Auto";
+import { Genero, Persona } from "../../Modelo/Persona";
 import { PersonaRepository } from "../personaRepository";
 import { randomUUID } from "crypto";
 
-const personasEnMemoria: Persona[] = [];
+const personasEnMemoria: Persona[] = [
+  {
+      id: "8933ce78-e5e0-42f1-bd6e-1cdff13a5950",
+      nombre : "Franco",
+      apellido : "Zocchi",
+      dni : "40495238",
+      fechaNacimiento: new Date("1997-09-16"),
+      genero: Genero.Masculino,
+      donanteDeOrganos: true,
+      autos: []
+  }
+];
 
 export class memoryPersonaRepository implements PersonaRepository {
-  
+  async getAutosById(id: string): Promise<Auto[]> {
+    const persona = await this.getById(id) as Persona;
+    return persona.autos
+  }
+
+  async addAuto(id: string, auto: Auto): Promise<void> {
+    const persona = await this.getById(id) as Persona;
+    persona.autos.push(auto);
+  }
+
   async getAll(): Promise<Persona[]> {
     return personasEnMemoria;
   }
@@ -41,4 +62,6 @@ export class memoryPersonaRepository implements PersonaRepository {
       personasEnMemoria.splice(index, 1);
     }
   }
+
+
 }
