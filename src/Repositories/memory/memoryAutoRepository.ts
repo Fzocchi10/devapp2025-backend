@@ -1,6 +1,7 @@
 import { randomUUID, UUID } from "crypto";
 import { Auto } from "../../Modelo/Auto";
 import { AutoRepository } from "../AutoRepository";
+import { personaService } from "../../inyeccion";
 
 let autosEnMemoria: Auto[] = [];
 
@@ -12,11 +13,11 @@ export class memoryAutoRepository implements AutoRepository{
         const auto = autosEnMemoria.find(auto => auto.id === id);
         return auto || null;
     }
-    async create(idDuenio: UUID, data: Omit<Auto, "id" | "dueñoId">): Promise<Auto> {
+    async create(idDuenio: UUID, data: Omit<Auto, "id" | "duenioId">): Promise<Auto> {
         const nuevoAuto: Auto = {
             ...data,
             id: randomUUID(),
-            dueñoId: idDuenio
+            duenioId: idDuenio
         }
 
         autosEnMemoria.push(nuevoAuto);
@@ -32,6 +33,7 @@ export class memoryAutoRepository implements AutoRepository{
         };
 
         return autosEnMemoria[index];
+
     }
 
     async delete(id: string): Promise<void> {

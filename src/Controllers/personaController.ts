@@ -22,10 +22,7 @@ export const getPersona = async (req: Request, res: Response): Promise<void> => 
 
 export const getAutosDeLaPersona = async (req: Request, res: Response): Promise<void> => {
   const persona = (req as any).persona as Persona;
-
-  const autos = persona.autos;
-
-  res.status(200).json(autos);
+  res.status(200).json(persona.autos);
 };
 
 // Crear una nueva persona

@@ -23,8 +23,10 @@ export class memoryPersonaRepository implements PersonaRepository {
   }
 
   async addAuto(id: string, auto: Auto): Promise<void> {
-    const persona = await this.getById(id) as Persona;
-    persona.autos.push(auto);
+    const persona = await this.getById(id);
+    if (persona) {
+      persona.autos.push(auto);
+    }
   }
 
   async getAll(): Promise<Persona[]> {

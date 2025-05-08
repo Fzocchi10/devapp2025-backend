@@ -18,7 +18,7 @@ export class AutoService {
   getById(id:string):Promise<Auto | null>{
     return this.repository.getById(id);
   }
-  create(idDuenio: string, data:Omit<Auto, "id" | "dueñoId">): Promise<Auto> {
+  create(idDuenio: string, data:Omit<Auto, "id" | "duenioId">): Promise<Auto> {
     return this.repository.create(idDuenio,data);
   }
   update(id: string, data: Partial<Auto>): Promise<Auto | null>{

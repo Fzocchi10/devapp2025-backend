@@ -8,8 +8,8 @@ import { Persona } from "../Modelo/Persona";
 // Obtener todos los autos
 export const getAutos = async (req: Request, res: Response) => {
     const autos = await autosService.getAll();
-    const listaDeAutos = autos.map(({ id, patente, marca,modelo,año }) => ({
-        id, patente, marca,modelo,año
+    const listaDeAutos = autos.map(({ id, patente, marca,modelo,anio }) => ({
+        id, patente, marca,modelo,anio
       }));
     res.status(200).json(listaDeAutos);
 };
@@ -18,24 +18,25 @@ export const getAutos = async (req: Request, res: Response) => {
 export const getAuto = async (req: Request, res: Response): Promise<void> => {
     const { id }  = req.params;
     const auto = await autosService.getById(id) as Auto;
-    let dueñoId = auto.id as string
-    const persona = await personaService.getById(dueñoId) as Persona;
+    let duenioId = await (req as any).auto.duenioId as string;
+    const persona = await personaService.getById(duenioId) as Persona;
     res.status(200).json({
+        "marca":auto.marca,
         "modelo": auto.modelo,
         "patente": auto.patente,
-        "año": auto.año,
+        "anio": auto.anio,
         "color": auto.color,
         "motor": auto.motor,
         "numeroChasis": auto.numeroChasis,
-        "dueño": persona?.apellido + " " + persona?.nombre
+        "duenio": persona?.apellido + " " + persona?.nombre
     });
 };
 
 // Crear un nuevo auto
 export const postAuto = async (req: Request, res: Response) => {
     const data = req.body;
-    const dueñoExistente = (req as any).dueño;
-    const idDuenio = dueñoExistente.id as string;
+    const duenioExistente = (req as any).duenio as Persona;
+    const idDuenio = duenioExistente.id as string;
 
     const nuevoAuto = await autosService.create(idDuenio,data);
     personaService.addAuto(idDuenio, nuevoAuto);
