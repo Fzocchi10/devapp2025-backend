@@ -28,23 +28,21 @@ export const getAutosDeLaPersona = async (req: Request, res: Response): Promise<
 // Crear una nueva persona
 export const postPersona = async (req: Request, res: Response) => {
   const data = req.body;
-  const persona = await personaService.create(data);
-  res.status(200).json(persona);
+  personaService.create(data);
+  res.status(200).json({mensaje: "Persona creada correctamente"});
 };
 
 // Actualizar una persona
 export const putPersona = async (req: Request, res: Response) => {
   const { id } = req.params;
   const data = req.body;
-  const persona = await personaService.update(id, data);
-
+  personaService.update(id, data);
   res.status(200).json({ mensaje: "Persona actualizada"});
 };
 
 // Eliminar una persona
 export const deletePersona = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const persona = await personaService.getById(id);
   await personaService.delete(id);
   res.status(200).json({ mensaje: "Persona eliminada correctamente" });
 };

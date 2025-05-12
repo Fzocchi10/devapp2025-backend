@@ -21,7 +21,7 @@ export class memoryAutoRepository implements AutoRepository{
             id: randomUUID(),
             duenioId: idDuenio
         }
-
+        personaService.addAuto(idDuenio, nuevoAuto);
         autosEnMemoria.push(nuevoAuto);
         return nuevoAuto;
     }
