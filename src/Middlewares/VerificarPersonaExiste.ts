@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from "express";
-import { personas } from "../Controllers/personaController";
+import { personaService } from "../inyeccion";
 import { UUID } from "crypto";
 
-export const verificarPersonaExiste = (req: Request, res: Response, next: NextFunction): void => {
+export const verificarPersonaExiste = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const id = req.params.id as UUID;
-    const persona = personas.find(p => p.id === id);
+    const persona = await personaService.getById(id);
 
     if (!persona) {
       res.status(404).json({ error: 'Persona no encontrada' });

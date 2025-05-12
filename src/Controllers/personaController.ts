@@ -1,90 +1,50 @@
 import { Request, Response } from "express";
+import { personaService } from "../inyeccion";
 import { Persona } from "../Modelo/Persona";
-import { autos } from "./autoController";
-import { randomUUID, UUID } from "crypto";
 
-export let personas: Persona[] = [];
+
 
 // Obtener todas las personas
-export const getPersonas = (req: Request, res: Response) => {
-    const listaDePersonas = personas.map(persona => ({
-        id: persona.id,
-        dni: persona.dni,
-        nombre: persona.nombre,
-        apellido: persona.apellido
-    }));
+export const getPersonas = async (req: Request, res: Response) => {
+  const personas = await personaService.getAll();
+  const listaDePersonas = personas.map(({ id, nombre, apellido, dni }) => ({
+    id, nombre, apellido, dni
+  }));
     res.status(200).json(listaDePersonas);
 };
 
 // Obtener una persona por ID
-export const getPersona = (req: Request, res: Response) => {
-    const persona = (req as any).persona;
-    res.status(200).json(persona);
+export const getPersona = async (req: Request, res: Response): Promise<void> => {
+  const { id } = req.params;
+  const persona = await personaService.getById(id);
+  res.status(200).json(persona);
 };
 
-export const getAutosDeLaPersona = (req: Request, res: Response) => {
+export const getAutosDeLaPersona = async (req: Request, res: Response): Promise<void> => {
   const persona = (req as any).persona as Persona;
-
-  const autos = persona.autos.map(auto => ({
-    id: auto.id,
-    patente: auto.patente,
-    marca: auto.marca,
-    modelo: auto.modelo,
-    año: auto.año
-}));
-
-  res.status(200).json(autos);
+  res.status(200).json(persona.autos);
 };
 
 // Crear una nueva persona
-export const postPersona = (req: Request, res: Response) => {
-  const { nombre, apellido, dni, fechaNacimiento, genero, donanteDeOrganos } = req.body;
-
-  const nuevaPersona = {
-    id: randomUUID(),
-    nombre,
-    apellido,
-    dni,
-    fechaNacimiento: new Date(fechaNacimiento),
-    genero,
-    donanteDeOrganos,
-    autos: []
-  };
-
-    personas.push(nuevaPersona);
-    res.status(200).json({ id: nuevaPersona.id });
-}
+export const postPersona = async (req: Request, res: Response) => {
+  const data = req.body;
+  const persona = await personaService.create(data);
+  res.status(200).json(persona);
+};
 
 // Actualizar una persona
-export const putPersona = (req: Request, res: Response) => {
-    const id = req.params.id as UUID;
-    const { nombre, apellido, dni, fechaNacimiento, genero, donanteDeOrganos } = req.body;
+export const putPersona = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const data = req.body;
+  const persona = await personaService.update(id, data);
 
-    const personaIndex = personas.findIndex(p => p.id === id);
-
-    if (personaIndex !== -1) {
-      const personaAct = personas[personaIndex];
-      personas[personaIndex] = {
-        ...personaAct,
-        nombre: nombre ?? personaAct.nombre,
-        apellido: apellido ?? personaAct.apellido,
-        dni: dni ?? personaAct.dni,
-        fechaNacimiento: fechaNacimiento ?? personaAct.fechaNacimiento,
-        genero: genero ?? personaAct.genero,
-        donanteDeOrganos: donanteDeOrganos ?? personaAct.donanteDeOrganos,
-      };
-      res.status(201).json({ mensaje: 'Persona actualizada correctamente', persona: personas[personaIndex].id, fecha : typeof fechaNacimiento });
-  }
+  res.status(200).json({ mensaje: "Persona actualizada"});
 };
 
 // Eliminar una persona
-export const deletePersona = (req: Request, res: Response) => {
-    const persona = (req as any).persona as Persona;
-    const personasFiltradas = personas.filter(p => p.id !== persona.id);
-    const autosFiltrados = autos.filter(a => a.dueñoId !== persona.id);
-
-    autos.length = 0;
-    autos.push(...autosFiltrados);
-    personas = personasFiltradas;
-    res.status(200).json({ mensaje: 'Persona eliminada correctamente' });
+export const deletePersona = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const persona = await personaService.getById(id);
+  await personaService.delete(id);
+  res.status(200).json({ mensaje: "Persona eliminada correctamente" });
 };
