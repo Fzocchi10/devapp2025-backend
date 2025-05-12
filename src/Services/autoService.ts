@@ -28,4 +28,8 @@ export class AutoService {
     return this.repository.delete(id);
   }
 
+  setAutos(autos:Auto[]): Promise<void>{
+    return this.repository.setAutos(autos);
+  }
+
 }

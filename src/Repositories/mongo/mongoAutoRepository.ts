@@ -17,5 +17,7 @@ export class mongoAutoRepository implements AutoRepository {
     delete(id: string): Promise<void> {
         throw new Error("Method not implemented.");
     }
-    
+    setAutos(autos:Auto[]): Promise<void> {
+        throw new Error("Method not implemented.");
+    }
 }

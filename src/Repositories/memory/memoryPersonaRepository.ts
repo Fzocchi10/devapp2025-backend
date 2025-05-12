@@ -1,7 +1,9 @@
+import { autosService, personaService } from "../../inyeccion";
 import { Auto } from "../../Modelo/Auto";
 import { Genero, Persona } from "../../Modelo/Persona";
 import { PersonaRepository } from "../personaRepository";
 import { randomUUID } from "crypto";
+import { memoryAutoRepository } from "./memoryAutoRepository";
 
 const personasEnMemoria: Persona[] = [
   {
@@ -60,9 +62,19 @@ export class memoryPersonaRepository implements PersonaRepository {
 
   async delete(id: string): Promise<void> {
     const index = personasEnMemoria.findIndex(p => p.id === id);
-    if (index !== -1) {
-      personasEnMemoria.splice(index, 1);
+    const autosEnMemoria = await autosService.getAll();
+    if (index === -1) {
+        throw new Error("Persona no encontrada");
     }
+
+    const persona = personasEnMemoria[index];
+    const autosDeLaPersona = await this.getAutosById(persona.id);
+    const autosEliminados = await autosEnMemoria.filter(a => !autosDeLaPersona.some(auto => auto.id === a.id));
+
+
+    await autosService.setAutos(autosEliminados);
+    personasEnMemoria.splice(index, 1);
+
   }
 
 

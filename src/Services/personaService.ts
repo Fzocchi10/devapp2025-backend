@@ -5,6 +5,7 @@ import { memoryPersonaRepository } from "../Repositories/memory/memoryPersonaRep
 import { Auto } from "../Modelo/Auto";
 
 export class PersonaService {
+
   private repository: PersonaRepository;
 
   constructor(tipo: "memory" | "mongo") {
