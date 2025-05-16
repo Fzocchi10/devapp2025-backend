@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { personaService } from "../inyeccion";
+import { personaService } from "../server";
 import { UUID } from "crypto";
 
 export const verificarDuenioExiste = async (req: Request, res: Response, next: NextFunction) => {

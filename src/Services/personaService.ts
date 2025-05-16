@@ -1,5 +1,5 @@
 import { PersonaRepository } from "../Repositories/personaRepository";
-import { Persona } from "../Modelo/Persona";
+import { Persona, PersonaResumen } from "../Modelo/Persona";
 import { mongoPersonaRepository } from "../Repositories/mongo/mongoPersonaRepository";
 import { memoryPersonaRepository } from "../Repositories/memory/memoryPersonaRepository";
 import { Auto } from "../Modelo/Auto";
@@ -8,13 +8,16 @@ export class PersonaService {
 
   private repository: PersonaRepository;
 
-  constructor(tipo: "memory" | "mongo") {
-    this.repository =
-      tipo === "mongo" ? new mongoPersonaRepository() : new memoryPersonaRepository();
+  constructor(tipo: PersonaRepository) {
+    this.repository = tipo;
   }
 
   getAll(): Promise<Persona[]> {
     return this.repository.getAll();
+  }
+
+  getLista(): Promise<PersonaResumen[]>{
+    return this.repository.getListar();
   }
 
   getById(id: string): Promise<Persona | null> {

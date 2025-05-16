@@ -7,7 +7,8 @@ const PersonaSchema = new Schema({
   dni: { type: String, required: true },
   fechaNacimiento: { type: Date, required: true },
   genero: { type: String, enum: ['Masculino', 'Femenino', 'No-Binario'], required: true },
-  donanteDeOrganos: { type: Boolean, required: true }
+  donanteDeOrganos: { type: Boolean, required: true },
+  autos: [{ type: mongoose.Schema.Types.ObjectId, ref: "Auto" }]
 });
 
 export const PersonaModel = mongoose.model("Persona", PersonaSchema);

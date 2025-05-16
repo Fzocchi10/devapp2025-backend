@@ -1,16 +1,13 @@
 import { Request, Response } from "express";
-import { personaService } from "../inyeccion";
+import { personaService } from "../server";
 import { Persona } from "../Modelo/Persona";
 
 
 
 // Obtener todas las personas
 export const getPersonas = async (req: Request, res: Response) => {
-  const personas = await personaService.getAll();
-  const listaDePersonas = personas.map(({ id, nombre, apellido, dni }) => ({
-    id, nombre, apellido, dni
-  }));
-    res.status(200).json(listaDePersonas);
+  const personas = await personaService.getLista();
+    res.status(200).json(personas);
 };
 
 // Obtener una persona por ID

@@ -1,7 +1,10 @@
-import { Auto } from "../../Modelo/Auto";
+import { Auto, AutoResumen } from "../../Modelo/Auto";
 import { AutoRepository } from "../AutoRepository";
 
 export class mongoAutoRepository implements AutoRepository {
+    getListar(): Promise<AutoResumen[]> {
+        throw new Error("Method not implemented.");
+    }
     getAll(): Promise<Auto[]> {
         throw new Error("Method not implemented.");
     }

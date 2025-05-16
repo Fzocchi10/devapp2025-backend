@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { autosService } from "../inyeccion";
+import { autosService } from "../server";
 import { UUID } from "crypto";
 
 export const verificarAutoExiste = async (req: Request, res: Response, next: NextFunction): Promise<void> => {

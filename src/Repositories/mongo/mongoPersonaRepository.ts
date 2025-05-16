@@ -1,9 +1,13 @@
 import { Auto } from "../../Modelo/Auto";
-import { Persona } from "../../Modelo/Persona";
-import { PersonaModel } from "../../Modelo/PersonaModel";
+import { Persona, PersonaResumen } from "../../Modelo/Persona";
 import { PersonaRepository } from "../personaRepository";
 
+
 export class mongoPersonaRepository implements PersonaRepository {
+    getListar(): Promise<PersonaResumen[]> {
+        throw new Error("Method not implemented.");
+    }
+    
     getAutosById(id: string): Promise<Auto[]> {
         throw new Error("Method not implemented.");
     }
@@ -11,15 +15,15 @@ export class mongoPersonaRepository implements PersonaRepository {
         throw new Error("Method not implemented.");
     }
     async getAll(): Promise<Persona[]> {
-        const personas = await PersonaModel.find();
-        return personas;
+        throw new Error("Method not implemented.");
     }
     getById(id: string): Promise<Persona | null> {
         throw new Error("Method not implemented.");
     }
-    create(data: Omit<Persona, "id" | "autos">): Promise<Persona> {
+    async create(data: Omit<Persona, "id" | "autos">): Promise<Persona> {
         throw new Error("Method not implemented.");
     }
+    
     update(id: string, data: Partial<Persona>): Promise<Persona | null> {
         throw new Error("Method not implemented.");
     }
