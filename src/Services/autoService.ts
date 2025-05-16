@@ -1,7 +1,5 @@
 import { Auto, AutoResumen } from "../Modelo/Auto";
 import { AutoRepository } from "../Repositories/AutoRepository";
-import { memoryAutoRepository } from "../Repositories/memory/memoryAutoRepository";
-import { mongoAutoRepository } from "../Repositories/mongo/mongoAutoRepository";
 
 export class AutoService {
   private repository: AutoRepository;

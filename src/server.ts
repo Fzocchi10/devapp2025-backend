@@ -1,14 +1,10 @@
 import process from 'process';
 import app from './app';
 import dotenv from 'dotenv';
-import { mongoPersonaRepository } from './Repositories/mongo/mongoPersonaRepository';
-import { mongoAutoRepository } from './Repositories/mongo/mongoAutoRepository';
-import { Db } from 'mongodb';
 import { PersonaService } from './Services/personaService';
 import { autoRepo, ConnectMemoryDB, ConnectMongoDB, personaRepo } from './inyeccionBBDD';
 import { AutoService } from './Services/autoService';
 dotenv.config();
-const { MongoClient } = require('mongodb');
 
 const port = process.env.PORT || 9000;
 export let personaService: PersonaService;
