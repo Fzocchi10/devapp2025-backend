@@ -19,14 +19,13 @@ if(process.env.DATABASE_TYPE === "memory"){
   
   console.log('Modo memoria activado');
 } else {
-  ConnectMongoDB();
-
-  personaService = new PersonaService(personaRepo);
-  autosService = new AutoService(autoRepo);
-  
-  console.log('Modo mongo activado');
+  ConnectMongoDB().then(() => {
+        personaService = new PersonaService(personaRepo);
+        autosService = new AutoService(autoRepo);
+        }).catch(error => {
+        console.error('Error conectando a MongoDB:', error);
+  });
 }
-
 
 app.get
   app.listen(port, () => {

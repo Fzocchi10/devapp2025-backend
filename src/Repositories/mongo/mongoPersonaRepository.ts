@@ -1,11 +1,35 @@
+import { ConnectMongoDB } from "../../inyeccionBBDD";
 import { Auto } from "../../Modelo/Auto";
 import { Persona, PersonaResumen } from "../../Modelo/Persona";
 import { PersonaRepository } from "../personaRepository";
+import { Collection, Db } from "mongodb";
 
 
 export class mongoPersonaRepository implements PersonaRepository {
-    getListar(): Promise<PersonaResumen[]> {
-        throw new Error("Method not implemented.");
+    private collectionPersona: Collection;
+    private collectionAuto: Collection;
+
+    constructor(db: Db) {
+        this.collectionPersona = db.collection("personas");
+        this.collectionAuto = db.collection("autos");
+    }
+
+    async getListar(): Promise<PersonaResumen[]> {
+        const listaDePersonas = await this.collectionPersona.find().project({
+            id: 1,
+            nombre: 1,
+            apellido: 1,
+            dni: 1
+        }).toArray(); // 👈 importante
+
+        const personasResumen: PersonaResumen[] = listaDePersonas.map((p: any) => ({
+            id: p.id,
+            nombre: p.nombre,
+            apellido: p.apellido,
+            dni: p.dni
+        }));
+
+        return personasResumen;
     }
     
     getAutosById(id: string): Promise<Auto[]> {
