@@ -1,3 +1,4 @@
+import { randomUUID } from "crypto";
 import { ConnectMongoDB } from "../../inyeccionBBDD";
 import { Auto } from "../../Modelo/Auto";
 import { Persona, PersonaResumen } from "../../Modelo/Persona";
@@ -20,7 +21,7 @@ export class mongoPersonaRepository implements PersonaRepository {
             nombre: 1,
             apellido: 1,
             dni: 1
-        }).toArray(); // 👈 importante
+        }).toArray();
 
         const personasResumen: PersonaResumen[] = listaDePersonas.map((p: any) => ({
             id: p.id,
@@ -45,7 +46,15 @@ export class mongoPersonaRepository implements PersonaRepository {
         throw new Error("Method not implemented.");
     }
     async create(data: Omit<Persona, "id" | "autos">): Promise<Persona> {
-        throw new Error("Method not implemented.");
+        const resultado = await this.collectionPersona.insertOne(data);
+    
+        const personaCreada: Persona = {
+            id: randomUUID(),
+            ...data,
+            autos: [] 
+        };
+
+        return personaCreada;
     }
     
     update(id: string, data: Partial<Persona>): Promise<Persona | null> {
