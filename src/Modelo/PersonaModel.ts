@@ -1,6 +1,9 @@
 import mongoose, { Schema } from "mongoose";
+import { Persona } from "./Persona";
 
-const PersonaSchema = new Schema({
+export interface PersonaDocument extends Persona, Document {}
+
+const PersonaSchema = new Schema<PersonaDocument>({
   id: { type: String, required: true },
   nombre: { type: String, required: true },
   apellido: { type: String, required: true },
@@ -11,4 +14,6 @@ const PersonaSchema = new Schema({
   autos: [{ type: mongoose.Schema.Types.ObjectId, ref: "Auto" }]
 });
 
-export const PersonaModel = mongoose.model("Persona", PersonaSchema);
+
+
+export const PersonaModel = mongoose.model<PersonaDocument>("Persona", PersonaSchema);

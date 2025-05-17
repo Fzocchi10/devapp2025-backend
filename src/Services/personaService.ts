@@ -1,7 +1,5 @@
 import { PersonaRepository } from "../Repositories/personaRepository";
 import { Persona, PersonaResumen } from "../Modelo/Persona";
-import { mongoPersonaRepository } from "../Repositories/mongo/mongoPersonaRepository";
-import { memoryPersonaRepository } from "../Repositories/memory/memoryPersonaRepository";
 import { Auto } from "../Modelo/Auto";
 
 export class PersonaService {

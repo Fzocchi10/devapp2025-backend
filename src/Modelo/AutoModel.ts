@@ -1,4 +1,8 @@
 import mongoose, { Schema } from "mongoose";
+import { Auto } from "./Auto";
+
+
+export interface AutoDocument extends Auto, Document {}
 
 const AutoSchema = new Schema({
   id: { type: String, required: true },
@@ -12,4 +16,4 @@ const AutoSchema = new Schema({
   duenioId: { type: String, required: true }
 })
 
-export const AutoModel = mongoose.model("Auto", AutoSchema);
+export const AutoModel = mongoose.model<AutoDocument>("Auto", AutoSchema);

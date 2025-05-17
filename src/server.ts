@@ -10,24 +10,23 @@ const port = process.env.PORT || 9000;
 export let personaService: PersonaService;
 export let autosService: AutoService;
 
-
-if(process.env.DATABASE_TYPE === "memory"){
-  ConnectMemoryDB();
-
+async function main() {
+  if(process.env.DATABASE_TYPE === "memory"){
+    ConnectMemoryDB();
+    console.log('Modo memoria activado');
+  } else {
+    await ConnectMongoDB();
+    console.log('Modo mongoDB activado');
+  }
   personaService = new PersonaService(personaRepo);
   autosService = new AutoService(autoRepo);
-  
-  console.log('Modo memoria activado');
-} else {
-  ConnectMongoDB().then(() => {
-        personaService = new PersonaService(personaRepo);
-        autosService = new AutoService(autoRepo);
-        }).catch(error => {
-        console.error('Error conectando a MongoDB:', error);
+
+  app.get
+    app.listen(port, () => {
+      console.log(`Example app listening on port ${port}`);
   });
 }
 
-app.get
-  app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`);
+main().catch((err) => {
+  console.error('Error iniciando la aplicación:', err);
 });

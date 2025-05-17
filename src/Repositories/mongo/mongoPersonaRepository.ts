@@ -1,66 +1,64 @@
 import { randomUUID } from "crypto";
-import { ConnectMongoDB } from "../../inyeccionBBDD";
 import { Auto } from "../../Modelo/Auto";
 import { Persona, PersonaResumen } from "../../Modelo/Persona";
 import { PersonaRepository } from "../personaRepository";
-import { Collection, Db } from "mongodb";
+import { PersonaDocument } from "../../Modelo/PersonaModel";
+import { Model } from "mongoose";
 
 
 export class mongoPersonaRepository implements PersonaRepository {
-    private collectionPersona: Collection;
-    private collectionAuto: Collection;
+    private modelPersona: Model<PersonaDocument>;
 
-    constructor(db: Db) {
-        this.collectionPersona = db.collection("personas");
-        this.collectionAuto = db.collection("autos");
+    constructor(modelPersona:Model<PersonaDocument>) {
+        this.modelPersona = modelPersona;
     }
 
     async getListar(): Promise<PersonaResumen[]> {
-        const listaDePersonas = await this.collectionPersona.find().project({
-            id: 1,
-            nombre: 1,
-            apellido: 1,
-            dni: 1
-        }).toArray();
+        const resultado = await this.modelPersona.find().select('id nombre apellido dni').lean();
+        return resultado;
+    }
 
-        const personasResumen: PersonaResumen[] = listaDePersonas.map((p: any) => ({
-            id: p.id,
-            nombre: p.nombre,
-            apellido: p.apellido,
-            dni: p.dni
-        }));
+    async getAutosById(id: string): Promise<Auto[]> {
+        const persona = await this.modelPersona.findOne({ id }).lean();
+        return persona?.autos || [];
+    }
 
-        return personasResumen;
+    async addAuto(id: string, auto: Auto): Promise<void> {
+        await this.modelPersona.updateOne(
+            { id },
+            { $push: { autos: auto } }
+        );
     }
-    
-    getAutosById(id: string): Promise<Auto[]> {
-        throw new Error("Method not implemented.");
-    }
-    addAuto(id: string, auto: Auto): Promise<void> {
-        throw new Error("Method not implemented.");
-    }
+
     async getAll(): Promise<Persona[]> {
-        throw new Error("Method not implemented.");
+        return this.modelPersona.find().lean();
     }
-    getById(id: string): Promise<Persona | null> {
-        throw new Error("Method not implemented.");
-    }
-    async create(data: Omit<Persona, "id" | "autos">): Promise<Persona> {
-        const resultado = await this.collectionPersona.insertOne(data);
-    
-        const personaCreada: Persona = {
-            id: randomUUID(),
-            ...data,
-            autos: [] 
-        };
 
-        return personaCreada;
+    getById(id: string): Promise<Persona | null> {
+        return this.modelPersona.findOne({ id }).lean();
     }
-    
-    update(id: string, data: Partial<Persona>): Promise<Persona | null> {
-        throw new Error("Method not implemented.");
+
+    async create(data: Omit<Persona, "id" | "autos">): Promise<Persona> {
+        const personaCompleta: Persona = {
+        ...data,
+        id: randomUUID(),
+        autos: []
+    };
+        const user = new this.modelPersona(personaCompleta);
+        return (await user.save()).toObject();
     }
-    delete(id: string): Promise<void> {
-        throw new Error("Method not implemented.");
+
+    async update(id: string, data: Partial<Persona>): Promise<Persona | null> {
+        const resultado = await this.modelPersona.findOneAndUpdate(
+            { id },
+            { $set: data },
+            { new: true }
+        ).lean();
+
+        return resultado;
+    }
+
+    async delete(id: string): Promise<void> {
+        await this.modelPersona.deleteOne({ id });
     }
 }
