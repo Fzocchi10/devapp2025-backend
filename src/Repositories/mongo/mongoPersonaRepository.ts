@@ -1,9 +1,10 @@
-import { randomUUID } from "crypto";
+import { randomUUID, UUID } from "crypto";
 import { Auto } from "../../Modelo/Auto";
 import { Persona, PersonaResumen } from "../../Modelo/Persona";
 import { PersonaRepository } from "../personaRepository";
 import { PersonaDocument } from "../../Modelo/PersonaModel";
 import { Model } from "mongoose";
+import { autosService } from "../../server";
 
 
 export class mongoPersonaRepository implements PersonaRepository {
@@ -19,14 +20,14 @@ export class mongoPersonaRepository implements PersonaRepository {
     }
 
     async getAutosById(id: string): Promise<Auto[]> {
-        const persona = await this.modelPersona.findOne({ id }).lean();
-        return persona?.autos || [];
+        const autos = await autosService.autosByIdDuenio(id);
+        return autos;
     }
 
     async addAuto(id: string, auto: Auto): Promise<void> {
-        await this.modelPersona.updateOne(
+        const result = await this.modelPersona.updateOne(
             { id },
-            { $push: { autos: auto } }
+            { $push: { autos: auto.id } }
         );
     }
 
@@ -43,9 +44,9 @@ export class mongoPersonaRepository implements PersonaRepository {
         ...data,
         id: randomUUID(),
         autos: []
-    };
-        const user = new this.modelPersona(personaCompleta);
-        return (await user.save()).toObject();
+        };
+        const persona = new this.modelPersona(personaCompleta);
+        return (await persona.save()).toObject();
     }
 
     async update(id: string, data: Partial<Persona>): Promise<Persona | null> {

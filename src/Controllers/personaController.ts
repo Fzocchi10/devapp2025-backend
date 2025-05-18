@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
-import { personaService } from "../server";
+import { autosService, personaService } from "../server";
 import { Persona } from "../Modelo/Persona";
+import { AutoService } from "../Services/autoService";
 
 
 
@@ -19,7 +20,8 @@ export const getPersona = async (req: Request, res: Response): Promise<void> => 
 
 export const getAutosDeLaPersona = async (req: Request, res: Response): Promise<void> => {
   const persona = (req as any).persona as Persona;
-  res.status(200).json(persona.autos);
+  const autosDeLaPersona = await autosService.autosByIdDuenio(persona.id);
+  res.status(200).json(autosDeLaPersona);
 };
 
 // Crear una nueva persona

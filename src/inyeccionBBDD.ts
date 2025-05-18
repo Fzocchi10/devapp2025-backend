@@ -6,6 +6,8 @@ import { AutoRepository } from "./Repositories/AutoRepository";
 import mongoose from 'mongoose';
 import { mongoPersonaRepository } from "./Repositories/mongo/mongoPersonaRepository";
 import { PersonaModel } from "./Modelo/PersonaModel";
+import { mongoAutoRepository } from './Repositories/mongo/mongoAutoRepository';
+import { AutoModel } from './Modelo/AutoModel';
 
 dotenv.config();
 
@@ -26,6 +28,7 @@ export async function ConnectMongoDB() {
         await mongoose.connect(`${url}/${dbName}`);
         console.log('Se conecto a MongoDB con mongose')
         personaRepo = new mongoPersonaRepository(PersonaModel);
+        autoRepo = new mongoAutoRepository(AutoModel);
 
     } catch (error) {
         console.error('Error al conectar a MongoDB:', error);

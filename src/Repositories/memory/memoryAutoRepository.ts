@@ -7,12 +7,12 @@ import { Persona } from "../../Modelo/Persona";
 let autosEnMemoria: Auto[] = [];
 
 export class memoryAutoRepository implements AutoRepository{
-    
+
     async getListar(): Promise<AutoResumen[]> {
         const autos = await this.getAll();
         const listaDeAutos = autos.map(({ id, patente, marca,modelo,anio }) => ({
-        id, patente, marca,modelo,anio
-      }));
+            id, patente, marca,modelo,anio
+        }));
         return listaDeAutos;
     }
 
@@ -65,6 +65,9 @@ export class memoryAutoRepository implements AutoRepository{
         await personaService.update(persona.id,persona)
     }
 
+    autosByIdDuenio(idDuenio: string): Promise<Auto[]> {
+        return personaService.autosById(idDuenio);
+    }
     async setAutos(autos: Auto[]): Promise<void> {
         autosEnMemoria = autos;
     }
