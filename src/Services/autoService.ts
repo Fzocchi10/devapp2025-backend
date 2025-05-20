@@ -1,18 +1,19 @@
-import { Auto } from "../Modelo/Auto";
+import { Auto, AutoResumen } from "../Modelo/Auto";
 import { AutoRepository } from "../Repositories/AutoRepository";
-import { memoryAutoRepository } from "../Repositories/memory/memoryAutoRepository";
-import { mongoAutoRepository } from "../Repositories/mongo/mongoAutoRepository";
 
 export class AutoService {
   private repository: AutoRepository;
 
-  constructor(tipo: "memory" | "mongo") {
-    this.repository =
-      tipo === "mongo" ? new mongoAutoRepository() : new memoryAutoRepository();
+  constructor(tipo: AutoRepository) {
+    this.repository = tipo;
   }
 
   getAll():Promise<Auto[]> {
     return this.repository.getAll();
+  }
+
+  getLista():Promise<AutoResumen[]> {
+    return this.repository.getListar();
   }
 
   getById(id:string):Promise<Auto | null>{
@@ -26,6 +27,14 @@ export class AutoService {
   }
   delete(id:string): Promise<void>{
     return this.repository.delete(id);
+  }
+
+  autosByIdDuenio(id: string): Promise<Auto[]>{
+      return this.repository.autosByIdDuenio(id);
+  }
+
+  deleteAutosByIdDuenio(idDuenio:string):Promise<void>{
+    return this.repository.deleteAutosByIdDuenio(idDuenio);
   }
 
   setAutos(autos:Auto[]): Promise<void>{

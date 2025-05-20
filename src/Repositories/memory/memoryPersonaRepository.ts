@@ -1,9 +1,9 @@
-import { autosService, personaService } from "../../inyeccion";
+import {autosService} from "../../server"
 import { Auto } from "../../Modelo/Auto";
-import { Genero, Persona } from "../../Modelo/Persona";
+import { Genero, Persona, PersonaResumen } from "../../Modelo/Persona";
 import { PersonaRepository } from "../personaRepository";
 import { randomUUID } from "crypto";
-import { memoryAutoRepository } from "./memoryAutoRepository";
+
 
 const personasEnMemoria: Persona[] = [
   {
@@ -29,6 +29,13 @@ export class memoryPersonaRepository implements PersonaRepository {
     if (persona) {
       persona.autos.push(auto);
     }
+  }
+
+  async getListar(): Promise<PersonaResumen[]>{
+    const listaDePersonas = personasEnMemoria.map(({ id, nombre, apellido, dni }) => ({
+      id, nombre, apellido, dni
+    }));
+    return listaDePersonas;
   }
 
   async getAll(): Promise<Persona[]> {
@@ -64,7 +71,7 @@ export class memoryPersonaRepository implements PersonaRepository {
     const index = personasEnMemoria.findIndex(p => p.id === id);
     const autosEnMemoria = await autosService.getAll();
     if (index === -1) {
-        throw new Error("Persona no encontrada");
+      throw new Error("Persona no encontrada");
     }
 
     const persona = personasEnMemoria[index];
@@ -78,4 +85,7 @@ export class memoryPersonaRepository implements PersonaRepository {
   }
 
 
+  deleteAuto(id: string, idDuenio: string): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
 }

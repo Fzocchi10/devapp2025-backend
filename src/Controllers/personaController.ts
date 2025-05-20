@@ -1,16 +1,11 @@
 import { Request, Response } from "express";
-import { personaService } from "../inyeccion";
+import { autosService, personaService } from "../server";
 import { Persona } from "../Modelo/Persona";
-
-
 
 // Obtener todas las personas
 export const getPersonas = async (req: Request, res: Response) => {
-  const personas = await personaService.getAll();
-  const listaDePersonas = personas.map(({ id, nombre, apellido, dni }) => ({
-    id, nombre, apellido, dni
-  }));
-    res.status(200).json(listaDePersonas);
+  const personas = await personaService.getLista();
+    res.status(200).json(personas);
 };
 
 // Obtener una persona por ID
@@ -22,7 +17,8 @@ export const getPersona = async (req: Request, res: Response): Promise<void> => 
 
 export const getAutosDeLaPersona = async (req: Request, res: Response): Promise<void> => {
   const persona = (req as any).persona as Persona;
-  res.status(200).json(persona.autos);
+  const autosDeLaPersona = await autosService.autosByIdDuenio(persona.id);
+  res.status(200).json(autosDeLaPersona);
 };
 
 // Crear una nueva persona

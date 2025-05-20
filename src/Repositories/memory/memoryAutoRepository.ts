@@ -1,12 +1,20 @@
 import { randomUUID, UUID } from "crypto";
-import { Auto } from "../../Modelo/Auto";
+import { Auto, AutoResumen } from "../../Modelo/Auto";
 import { AutoRepository } from "../AutoRepository";
-import { personaService } from "../../inyeccion";
+import { personaService } from "../../server";
 import { Persona } from "../../Modelo/Persona";
 
 let autosEnMemoria: Auto[] = [];
 
 export class memoryAutoRepository implements AutoRepository{
+
+    async getListar(): Promise<AutoResumen[]> {
+        const autos = await this.getAll();
+        const listaDeAutos = autos.map(({ id, patente, marca,modelo,anio }) => ({
+            id, patente, marca,modelo,anio
+        }));
+        return listaDeAutos;
+    }
 
     async getAll(): Promise<Auto[]> {
         return autosEnMemoria;
@@ -57,7 +65,14 @@ export class memoryAutoRepository implements AutoRepository{
         await personaService.update(persona.id,persona)
     }
 
+    autosByIdDuenio(idDuenio: string): Promise<Auto[]> {
+        return personaService.autosById(idDuenio);
+    }
     async setAutos(autos: Auto[]): Promise<void> {
         autosEnMemoria = autos;
+    }
+
+    deleteAutosByIdDuenio(idDuenio: string): Promise<void> {
+        throw new Error("Method not implemented.");
     }
 }

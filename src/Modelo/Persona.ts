@@ -17,3 +17,10 @@ export interface Persona {
     donanteDeOrganos: boolean,
     autos: Auto[]
 }
+
+export type PersonaResumen = {
+    id:UUID,
+    nombre: string;
+    apellido: string;
+    dni: string;
+}

@@ -11,3 +11,11 @@ export interface Auto {
     motor: string,
     duenioId: UUID;
 }
+
+export type AutoResumen = {
+    id: UUID,
+    marca: string,
+    modelo : string,
+    anio: number,
+    patente : string,
+}

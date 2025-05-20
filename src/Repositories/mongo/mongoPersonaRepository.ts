@@ -1,27 +1,73 @@
+import { randomUUID} from "crypto";
 import { Auto } from "../../Modelo/Auto";
-import { Persona } from "../../Modelo/Persona";
+import { Persona, PersonaResumen } from "../../Modelo/Persona";
 import { PersonaRepository } from "../personaRepository";
+import { PersonaDocument } from "../../Modelo/PersonaModel";
+import { Model } from "mongoose";
+import { autosService } from "../../server";
+
 
 export class mongoPersonaRepository implements PersonaRepository {
-    getAutosById(id: string): Promise<Auto[]> {
-        throw new Error("Method not implemented.");
+    private modelPersona: Model<PersonaDocument>;
+
+    constructor(modelPersona:Model<PersonaDocument>) {
+        this.modelPersona = modelPersona;
     }
-    addAuto(id: string, auto: Auto): Promise<void> {
-        throw new Error("Method not implemented.");
+
+    async getListar(): Promise<PersonaResumen[]> {
+        const resultado = await this.modelPersona.find().select('id nombre apellido dni').lean();
+        return resultado;
     }
-    getAll(): Promise<Persona[]> {
-        throw new Error("Method not implemented.");
+
+    async getAutosById(id: string): Promise<Auto[]> {
+        const autos = await autosService.autosByIdDuenio(id);
+        return autos;
     }
-    getById(id: string): Promise<Persona | null> {
-        throw new Error("Method not implemented.");
+
+    async addAuto(id: string, auto: Auto): Promise<void> {
+        const result = await this.modelPersona.updateOne(
+            { id },
+            { $push: { autos: auto.id } }
+        );
     }
-    create(data: Omit<Persona, "id" | "autos">): Promise<Persona> {
-        throw new Error("Method not implemented.");
+
+    async deleteAuto(idAuto: string, duenioId: string):Promise<void>{
+        const resultado = await this.modelPersona.updateOne(
+        { id: duenioId },
+        { $pull: { autos: idAuto } }
+    );
     }
-    update(id: string, data: Partial<Persona>): Promise<Persona | null> {
-        throw new Error("Method not implemented.");
+
+    async getAll(): Promise<Persona[]> {
+        return this.modelPersona.find().lean();
     }
-    delete(id: string): Promise<void> {
-        throw new Error("Method not implemented.");
+
+    async getById(id: string): Promise<Persona | null> {
+        return await this.modelPersona.findOne({ id }).lean();
+    }
+
+    async create(data: Omit<Persona, "id" | "autos">): Promise<Persona> {
+        const personaCompleta: Persona = {
+        ...data,
+        id: randomUUID(),
+        autos: []
+        };
+        const persona = new this.modelPersona(personaCompleta);
+        return (await persona.save()).toObject();
+    }
+
+    async update(id: string, data: Partial<Persona>): Promise<Persona | null> {
+        const resultado = await this.modelPersona.findOneAndUpdate(
+            { id },
+            { $set: data },
+            { new: true }
+        ).lean();
+
+        return resultado;
+    }
+
+    async delete(id: string): Promise<void> {
+        await this.modelPersona.deleteOne({ id });
+        await autosService.deleteAutosByIdDuenio(id);
     }
 }

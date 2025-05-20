@@ -1,16 +1,13 @@
 import { Request, Response } from "express";
 import { Auto } from "../Modelo/Auto";
 import { UUID } from "crypto";
-import { autosService, personaService } from "../inyeccion";
+import { autosService, personaService } from "../server";
 import { Persona } from "../Modelo/Persona";
 
 
 // Obtener todos los autos
 export const getAutos = async (req: Request, res: Response) => {
-    const autos = await autosService.getAll();
-    const listaDeAutos = autos.map(({ id, patente, marca,modelo,anio }) => ({
-        id, patente, marca,modelo,anio
-      }));
+    const listaDeAutos = await autosService.getLista();
     res.status(200).json(listaDeAutos);
 };
 

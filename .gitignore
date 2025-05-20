@@ -4,9 +4,8 @@ Thumbs.db
 
 package-lock.json
 node_modules/
-*.env
 
 tsconfig.build.json
 
 dist/
-
+.env
