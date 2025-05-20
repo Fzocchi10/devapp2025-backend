@@ -4,10 +4,18 @@ export interface Auto {
     id: UUID,
     marca: string,
     modelo : string,
-    año: number,
+    anio: number,
     patente : string,
     color: string,
     numeroChasis: string,
     motor: string,
-    dueñoId: UUID;
+    duenioId: UUID;
+}
+
+export type AutoResumen = {
+    id: UUID,
+    marca: string,
+    modelo : string,
+    anio: number,
+    patente : string,
 }
