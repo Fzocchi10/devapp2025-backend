@@ -2,7 +2,7 @@ import process from 'process';
 import app from './app';
 import dotenv from 'dotenv';
 import { PersonaService } from './Services/personaService';
-import { autoRepo, ConnectMemoryDB, ConnectMongoDB, personaRepo } from './inyeccionBBDD';
+import { autoRepo, ConnectFirebase, ConnectMemoryDB, ConnectMongoDB, personaRepo } from './inyeccionBBDD';
 import { AutoService } from './Services/autoService';
 dotenv.config();
 
@@ -14,10 +14,14 @@ async function main() {
   if(process.env.DATABASE_TYPE === "memory"){
     ConnectMemoryDB();
     console.log('Modo memoria activado');
-  } else {
+  } else if (process.env.DATABASE_TYPE === "mongodb"){
     await ConnectMongoDB();
     console.log('Modo mongoDB activado');
+  } else {
+    await ConnectFirebase();
+    console.log('Modo firebase activado');
   }
+
   personaService = new PersonaService(personaRepo);
   autosService = new AutoService(autoRepo);
 

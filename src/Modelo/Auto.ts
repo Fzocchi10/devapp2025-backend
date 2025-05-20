@@ -1,7 +1,7 @@
 import { UUID } from "crypto";
 
 export interface Auto {
-    id: UUID,
+    id: string,
     marca: string,
     modelo : string,
     anio: number,
@@ -9,11 +9,11 @@ export interface Auto {
     color: string,
     numeroChasis: string,
     motor: string,
-    duenioId: UUID;
+    duenioId: string;
 }
 
 export type AutoResumen = {
-    id: UUID,
+    id: string,
     marca: string,
     modelo : string,
     anio: number,

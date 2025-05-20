@@ -8,6 +8,10 @@ import { mongoPersonaRepository } from "./Repositories/mongo/mongoPersonaReposit
 import { PersonaModel } from "./Modelo/PersonaModel";
 import { mongoAutoRepository } from './Repositories/mongo/mongoAutoRepository';
 import { AutoModel } from './Modelo/AutoModel';
+import admin from 'firebase-admin';
+import * as path from 'path';
+import { fbPersonaRepository } from './Repositories/firebase/fbPersonaRepository';
+import { fbAutoRepository } from './Repositories/firebase/fbAutoRepository';
 
 dotenv.config();
 
@@ -35,3 +39,19 @@ export async function ConnectMongoDB() {
         throw error;
     }
 }
+
+
+export function ConnectFirebase() {
+  const serviceAccountPath = path.resolve(process.env.FIREBASE_CREDENTIALS_PATH!);
+
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccountPath),
+    databaseURL: 'devapp2025-56b90.firebaseapp.com',
+  });
+
+  personaRepo = new fbPersonaRepository();
+  autoRepo = new fbAutoRepository();
+
+  console.log("Firebase conectado correctamente");
+}
+

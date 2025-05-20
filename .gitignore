@@ -3,9 +3,11 @@ Thumbs.db
 .tmp/
 
 package-lock.json
-node_modules/
+node_modules
+config/
 
 tsconfig.build.json
 
-dist/
-.env
+dist
+.env/
+
