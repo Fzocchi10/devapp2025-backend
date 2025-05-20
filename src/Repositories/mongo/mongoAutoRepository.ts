@@ -35,30 +35,30 @@ export class mongoAutoRepository implements AutoRepository {
             duenioId: idDuenio as UUID
         };
 
-        const auto = new this.modelAuto(autoCompleto);
-        await auto.save();
-
-        const autoConId: Auto = {
-            ...autoCompleto,
-            id: autoId
-        };
-
-        await personaService.addAuto(idDuenio, auto);
-        return (auto.id);
+        await this.modelAuto.create(autoCompleto);
+        await personaService.addAuto(idDuenio, autoCompleto);
+        return (autoCompleto);
 
     }
 
-    update(id: string, data: Partial<Auto>): Promise<Auto | null> {
-        throw new Error("Method not implemented.");
+    async update(id: string, data: Partial<Auto>): Promise<Auto | null> {
+        const autoActualizado = await this.modelAuto.findOneAndUpdate({id}, {$set: data}, { new: true });
+        return autoActualizado;
     }
 
     async delete(id: string): Promise<void> {
+        const duenioId = await this.modelAuto.findOne({id});
         await this.modelAuto.deleteOne({id});
+        await personaService.deleteAuto(id, duenioId?.duenioId as string);
     }
 
     async autosByIdDuenio(idDuenio: string): Promise<Auto[]> {
-        const autos = await this.modelAuto.find({ idDuenio }).select('id patente marca modelo anio').lean();
+        const autos = await this.modelAuto.find({ duenioId: idDuenio }).select('id patente marca modelo anio').lean();
         return autos;
+    }
+
+    async deleteAutosByIdDuenio(idDuenio:string):Promise<void>{
+        await this.modelAuto.deleteMany({ duenioId: idDuenio });
     }
 
     setAutos(autos:Auto[]): Promise<void> {

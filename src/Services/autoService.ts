@@ -1,5 +1,3 @@
-import { UUID } from "crypto";
-import { FlattenMaps } from "mongoose";
 import { Auto, AutoResumen } from "../Modelo/Auto";
 import { AutoRepository } from "../Repositories/AutoRepository";
 
@@ -33,6 +31,10 @@ export class AutoService {
 
   autosByIdDuenio(id: string): Promise<Auto[]>{
       return this.repository.autosByIdDuenio(id);
+  }
+
+  deleteAutosByIdDuenio(idDuenio:string):Promise<void>{
+    return this.repository.deleteAutosByIdDuenio(idDuenio);
   }
 
   setAutos(autos:Auto[]): Promise<void>{

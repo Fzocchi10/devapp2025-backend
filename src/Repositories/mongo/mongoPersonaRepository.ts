@@ -1,4 +1,4 @@
-import { randomUUID, UUID } from "crypto";
+import { randomUUID} from "crypto";
 import { Auto } from "../../Modelo/Auto";
 import { Persona, PersonaResumen } from "../../Modelo/Persona";
 import { PersonaRepository } from "../personaRepository";
@@ -31,12 +31,19 @@ export class mongoPersonaRepository implements PersonaRepository {
         );
     }
 
+    async deleteAuto(idAuto: string, duenioId: string):Promise<void>{
+        const resultado = await this.modelPersona.updateOne(
+        { id: duenioId },
+        { $pull: { autos: idAuto } }
+    );
+    }
+
     async getAll(): Promise<Persona[]> {
         return this.modelPersona.find().lean();
     }
 
-    getById(id: string): Promise<Persona | null> {
-        return this.modelPersona.findOne({ id }).lean();
+    async getById(id: string): Promise<Persona | null> {
+        return await this.modelPersona.findOne({ id }).lean();
     }
 
     async create(data: Omit<Persona, "id" | "autos">): Promise<Persona> {
@@ -61,5 +68,6 @@ export class mongoPersonaRepository implements PersonaRepository {
 
     async delete(id: string): Promise<void> {
         await this.modelPersona.deleteOne({ id });
+        await autosService.deleteAutosByIdDuenio(id);
     }
 }

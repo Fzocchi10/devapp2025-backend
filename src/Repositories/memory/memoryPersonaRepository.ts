@@ -71,7 +71,7 @@ export class memoryPersonaRepository implements PersonaRepository {
     const index = personasEnMemoria.findIndex(p => p.id === id);
     const autosEnMemoria = await autosService.getAll();
     if (index === -1) {
-        throw new Error("Persona no encontrada");
+      throw new Error("Persona no encontrada");
     }
 
     const persona = personasEnMemoria[index];
@@ -85,4 +85,7 @@ export class memoryPersonaRepository implements PersonaRepository {
   }
 
 
+  deleteAuto(id: string, idDuenio: string): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
 }

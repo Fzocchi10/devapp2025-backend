@@ -1,9 +1,6 @@
 import { Request, Response } from "express";
 import { autosService, personaService } from "../server";
 import { Persona } from "../Modelo/Persona";
-import { AutoService } from "../Services/autoService";
-
-
 
 // Obtener todas las personas
 export const getPersonas = async (req: Request, res: Response) => {

@@ -71,4 +71,8 @@ export class memoryAutoRepository implements AutoRepository{
     async setAutos(autos: Auto[]): Promise<void> {
         autosEnMemoria = autos;
     }
+
+    deleteAutosByIdDuenio(idDuenio: string): Promise<void> {
+        throw new Error("Method not implemented.");
+    }
 }

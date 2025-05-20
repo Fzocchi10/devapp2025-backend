@@ -9,4 +9,5 @@ export interface AutoRepository {
   delete(id: string): Promise<void>;
   setAutos(autos: Auto[]): Promise<void>;
   autosByIdDuenio(idDuenio: string): Promise<Auto[]>;
+  deleteAutosByIdDuenio(idDuenio: string): Promise<void>;
 }
