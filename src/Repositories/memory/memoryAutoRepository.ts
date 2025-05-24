@@ -29,29 +29,19 @@ export class memoryAutoRepository implements AutoRepository{
             id: randomUUID(),
             duenioId: idDuenio
         }
-        personaService.addAuto(idDuenio, nuevoAuto);
+        personaService.addAuto(idDuenio, nuevoAuto.id);
         autosEnMemoria.push(nuevoAuto);
         return nuevoAuto;
     }
     async update(id: string, data: Partial<Auto>): Promise<Auto | null> {
         const index = autosEnMemoria.findIndex(a => a.id === id);
-        const personas = await personaService.getAll();
         if (index === -1) return null;
 
         autosEnMemoria[index] = {
             ...autosEnMemoria[index],
             ...data
         };
-
-        for (const persona of personas) {
-            const autoIndex = persona.autos.findIndex(a => a.id === id);
-            if (autoIndex !== -1) {
-                persona.autos[autoIndex] = autosEnMemoria[index];
-            }
-        }
-
         return autosEnMemoria[index];
-
     }
 
     async delete(id: string): Promise<void> {
@@ -61,12 +51,20 @@ export class memoryAutoRepository implements AutoRepository{
         }
         const persona = await personaService.getById(auto.duenioId) as Persona;
         autosEnMemoria = autosEnMemoria.filter(a => a.id !== id);
-        persona.autos = persona.autos.filter(a => a.id !== id);
+        persona.autos = persona.autos.filter(a => a !== id);
         await personaService.update(persona.id,persona)
     }
 
-    autosByIdDuenio(idDuenio: string): Promise<Auto[]> {
-        return personaService.autosById(idDuenio);
+    async autosByIdDuenio(idDuenio: string): Promise<AutoResumen[]> {
+        return autosEnMemoria
+        .filter(a => a.duenioId === idDuenio)
+        .map(a => ({
+            id: a.id,
+            marca: a.marca,
+            modelo: a.modelo,
+            anio: a.anio,
+            patente: a.patente
+        }));
     }
     async setAutos(autos: Auto[]): Promise<void> {
         autosEnMemoria = autos;

@@ -1,7 +1,8 @@
-import { Auto } from "../../Modelo/Auto";
+import { Auto, AutoResumen } from "../../Modelo/Auto";
 import admin from 'firebase-admin';
 import { Persona, PersonaResumen } from "../../Modelo/Persona";
 import { PersonaRepository } from "../personaRepository";
+import { randomUUID } from "crypto";
 
 export class fbPersonaRepository implements PersonaRepository{
     private colleccion;
@@ -54,15 +55,14 @@ export class fbPersonaRepository implements PersonaRepository{
     }
 
     async create(data: Omit<Persona, "id" | "autos">): Promise<Persona> {
-        const nuevaPersona = await this.colleccion.add(data);
-
-        return {
-            id: nuevaPersona.id,
+           const personaCompleta: Persona = {
             ...data,
-            autos: []
-        };
+            id: randomUUID(),
+            autos:[]
+           };
+           const persona = await this.colleccion.add(personaCompleta);
+           return personaCompleta;
     }
-
     async update(id: string, data: Partial<Persona>): Promise<Persona | null> {
         const persona = await this.colleccion.doc(id);
         const datosPersona = await persona.get();
@@ -89,13 +89,19 @@ export class fbPersonaRepository implements PersonaRepository{
         await persona.delete();
     }
 
-    addAuto(id: string, auto: Auto): Promise<void> {
-        throw new Error("Method not implemented.");
+    async addAuto(id: string, idAuto: string): Promise<void> {
+        if (!id || id.trim() === "") {
+        throw new Error("ID de persona inválido");
+    }
+
+        const persona = await this.colleccion.doc(id);
+
+        persona.update({autos: admin.firestore.FieldValue.arrayUnion(idAuto)});
     }
     deleteAuto(id: string, idDuenio: string): Promise<void> {
         throw new Error("Method not implemented.");
     }
-    getAutosById(id: string): Promise<Auto[]> {
+    getAutosById(id: string): Promise<AutoResumen[]> {
         throw new Error("Method not implemented.");
     }
 }

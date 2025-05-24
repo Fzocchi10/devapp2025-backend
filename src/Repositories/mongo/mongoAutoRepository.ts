@@ -36,7 +36,7 @@ export class mongoAutoRepository implements AutoRepository {
         };
 
         await this.modelAuto.create(autoCompleto);
-        await personaService.addAuto(idDuenio, autoCompleto);
+        await personaService.addAuto(idDuenio, autoCompleto.id);
         return (autoCompleto);
 
     }
@@ -52,8 +52,8 @@ export class mongoAutoRepository implements AutoRepository {
         await personaService.deleteAuto(id, duenioId?.duenioId as string);
     }
 
-    async autosByIdDuenio(idDuenio: string): Promise<Auto[]> {
-        const autos = await this.modelAuto.find({ duenioId: idDuenio }).select('id patente marca modelo anio').lean();
+    async autosByIdDuenio(idDuenio: string): Promise<AutoResumen[]> {
+        const autos = await this.modelAuto.find({ duenioId: idDuenio }).lean();
         return autos;
     }
 

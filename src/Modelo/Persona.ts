@@ -15,7 +15,7 @@ export interface Persona {
     fechaNacimiento: Date,
     genero: Genero
     donanteDeOrganos: boolean,
-    autos: Auto[]
+    autos: string[]
 }
 
 export type PersonaResumen = {

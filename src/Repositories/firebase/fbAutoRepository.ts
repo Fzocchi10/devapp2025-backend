@@ -1,4 +1,6 @@
+import { randomUUID } from "crypto";
 import { Auto, AutoResumen } from "../../Modelo/Auto";
+import { personaService } from "../../server";
 import { AutoRepository } from "../AutoRepository";
 import admin from 'firebase-admin';
 
@@ -55,14 +57,18 @@ export class fbAutoRepository implements AutoRepository{
         };
     }
 
-    async create(idDuenio: string, data: Omit<Auto, "id" | "duenioId">): Promise<Auto> {
-        const nuevoAuto = await this.colleccion.add(data);
 
-        return {
-            id: nuevoAuto.id,
+    async create(idDuenio: string, data: Omit<Auto, "id" | "duenioId">): Promise<Auto> {
+        const nuevoAuto:Auto = {
+            id: randomUUID(),
             ...data,
             duenioId: idDuenio
         };
+
+        await this.colleccion.add(nuevoAuto);
+        await personaService.addAuto(nuevoAuto.duenioId,nuevoAuto.id);
+
+        return nuevoAuto;
     }
 
     async update(id: string, data: Partial<Auto>): Promise<Auto | null> {
@@ -93,8 +99,27 @@ export class fbAutoRepository implements AutoRepository{
     setAutos(autos: Auto[]): Promise<void> {
         throw new Error("Method not implemented.");
     }
-    autosByIdDuenio(idDuenio: string): Promise<Auto[]> {
-        throw new Error("Method not implemented.");
+
+    async autosByIdDuenio(idDuenio: string): Promise<AutoResumen[]> {
+       const listaDeAutos =  await this.colleccion.doc(idDuenio).get();
+
+       if(!listaDeAutos){
+            throw new Error("No se encontraron autos");
+       }
+
+       const data = listaDeAutos.data();
+
+       const autosByIdDuenio = data?.map((doc: { id: any; }) => {
+            return {
+            id: doc.id,
+            marca: data.marca,
+            modelo: data.modelo,
+            patente: data.patente,
+            anio: data.anio
+            };
+       });
+       return autosByIdDuenio;
+
     }
     deleteAutosByIdDuenio(idDuenio: string): Promise<void> {
         throw new Error("Method not implemented.");

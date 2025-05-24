@@ -1,5 +1,5 @@
 import {autosService} from "../../server"
-import { Auto } from "../../Modelo/Auto";
+import { Auto, AutoResumen } from "../../Modelo/Auto";
 import { Genero, Persona, PersonaResumen } from "../../Modelo/Persona";
 import { PersonaRepository } from "../personaRepository";
 import { randomUUID } from "crypto";
@@ -19,15 +19,15 @@ const personasEnMemoria: Persona[] = [
 ];
 
 export class memoryPersonaRepository implements PersonaRepository {
-  async getAutosById(id: string): Promise<Auto[]> {
-    const persona = await this.getById(id) as Persona;
-    return persona.autos
+  async getAutosById(id: string): Promise<AutoResumen[]> {
+    const autos = await autosService.autosByIdDuenio(id);
+    return autos;
   }
 
-  async addAuto(id: string, auto: Auto): Promise<void> {
+  async addAuto(id: string, autoId: string): Promise<void> {
     const persona = await this.getById(id);
     if (persona) {
-      persona.autos.push(auto);
+      persona.autos.push(autoId);
     }
   }
 
