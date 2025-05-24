@@ -34,7 +34,7 @@ export const postAuto = async (req: Request, res: Response) => {
     const duenioExistente = (req as any).duenio as Persona;
 
     const nuevoAuto = await autosService.create(duenioExistente.id,data);
-    res.status(200).json({ id: nuevoAuto });
+    res.status(200).json(nuevoAuto );
 };
 
 // Actualizar un auto

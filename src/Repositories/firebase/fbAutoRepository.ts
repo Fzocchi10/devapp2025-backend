@@ -24,7 +24,8 @@ export class fbAutoRepository implements AutoRepository{
             const data = doc.data();
 
             return {
-            id: doc.id,
+            _id: doc.id,
+            id: data.id,
             marca: data.marca,
             modelo: data.modelo,
             patente: data.patente,
@@ -36,13 +37,10 @@ export class fbAutoRepository implements AutoRepository{
     }
 
     async getById(id: string): Promise<Auto | null> {
-        const auto = await this.colleccion.doc(id).get();
+        const auto = await this.colleccion.where('id', '==', id).get();
 
-        if (!auto.exists) {
-            return null;
-        }
-
-        const data = auto.data();
+        const doc = auto.docs[0];
+        const data = doc.data();
 
         return {
             id: data?.id,
@@ -64,20 +62,19 @@ export class fbAutoRepository implements AutoRepository{
             ...data,
             duenioId: idDuenio
         };
-
-        await this.colleccion.add(nuevoAuto);
-        await personaService.addAuto(nuevoAuto.duenioId,nuevoAuto.id);
+        const agregoAuto = await this.colleccion.add(nuevoAuto);
+        await personaService.addAuto(idDuenio, agregoAuto.id)
 
         return nuevoAuto;
     }
 
     async update(id: string, data: Partial<Auto>): Promise<Auto | null> {
-        const auto = await this.colleccion.doc(id);
-        const datosAuto = await auto.get();
+        const auto = await this.colleccion.where('id', '==', id).get();
+        const autoRef =  auto.docs[0].ref;
 
-        await auto.update(data);
+        await autoRef.update(data);
 
-        const actualizarAuto = await auto.get();
+        const actualizarAuto = await autoRef.get();
         const actualizarDatos = actualizarAuto.data();
 
         return {
@@ -93,29 +90,29 @@ export class fbAutoRepository implements AutoRepository{
         }
     }
     async delete(id: string): Promise<void> {
-        const auto = await this.colleccion.doc(id);
-        await auto.delete();
+        const auto = await this.colleccion.where('id', '==', id).get();
+        const autoRef = auto.docs[0].ref;
+        await autoRef.delete();
     }
     setAutos(autos: Auto[]): Promise<void> {
         throw new Error("Method not implemented.");
     }
 
     async autosByIdDuenio(idDuenio: string): Promise<AutoResumen[]> {
-       const listaDeAutos =  await this.colleccion.doc(idDuenio).get();
+       const listaDeAutos =  await this.colleccion.where('duenioId', '==', idDuenio).get();
 
        if(!listaDeAutos){
             throw new Error("No se encontraron autos");
        }
 
-       const data = listaDeAutos.data();
-
-       const autosByIdDuenio = data?.map((doc: { id: any; }) => {
+       const autosByIdDuenio = listaDeAutos.docs.map(doc => {
+            const data = doc.data();
             return {
-            id: doc.id,
-            marca: data.marca,
-            modelo: data.modelo,
-            patente: data.patente,
-            anio: data.anio
+                id: doc.id,
+                marca: data.marca,
+                modelo: data.modelo,
+                patente: data.patente,
+                anio: data.anio
             };
        });
        return autosByIdDuenio;

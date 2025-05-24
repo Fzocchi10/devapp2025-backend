@@ -23,7 +23,8 @@ export class fbPersonaRepository implements PersonaRepository{
             const data = doc.data();
 
             return {
-            id: doc.id,
+            _id: doc.id,
+            id: data.id,
             nombre: data.nombre,
             apellido: data.apellido,
             dni: data.dni
@@ -34,13 +35,10 @@ export class fbPersonaRepository implements PersonaRepository{
     }
 
     async getById(id: string): Promise<Persona | null> {
-        const persona = await this.colleccion.doc(id).get();
+        const persona = await this.colleccion.where('id', '==', id).get();
 
-        if (!persona.exists) {
-            return null;
-        }
-
-        const data = persona.data();
+        const doc = persona.docs[0];
+        const data = doc.data();
 
         return {
             id: data?.id,
@@ -60,16 +58,17 @@ export class fbPersonaRepository implements PersonaRepository{
             id: randomUUID(),
             autos:[]
            };
-           const persona = await this.colleccion.add(personaCompleta);
+           await this.colleccion.add(personaCompleta);
            return personaCompleta;
     }
+
     async update(id: string, data: Partial<Persona>): Promise<Persona | null> {
-        const persona = await this.colleccion.doc(id);
-        const datosPersona = await persona.get();
+        const persona = await this.colleccion.where('id', '==', id).get();
+        const personaRef =  persona.docs[0].ref;
 
-        await persona.update(data);
+        await personaRef.update(data);
 
-        const actualizarPersona = await persona.get();
+        const actualizarPersona = await personaRef.get();
         const actualizarDatos = actualizarPersona.data();
 
         return {
@@ -85,18 +84,16 @@ export class fbPersonaRepository implements PersonaRepository{
     }
 
     async delete(id: string): Promise<void> {
-        const persona = await this.colleccion.doc(id);
-        await persona.delete();
+        const persona = await this.colleccion.where('id', '==', id).get();
+        const personaRef = persona.docs[0].ref;
+        await personaRef.delete();
     }
 
     async addAuto(id: string, idAuto: string): Promise<void> {
-        if (!id || id.trim() === "") {
-        throw new Error("ID de persona inválido");
-    }
+        const persona = await this.getById(id);
+        const nuevosAutos = persona?.autos ? [...persona.autos, idAuto] : [idAuto] ;
 
-        const persona = await this.colleccion.doc(id);
-
-        persona.update({autos: admin.firestore.FieldValue.arrayUnion(idAuto)});
+        await this.update(id, {nuevosAutos} as Partial<Persona>);
     }
     deleteAuto(id: string, idDuenio: string): Promise<void> {
         throw new Error("Method not implemented.");
