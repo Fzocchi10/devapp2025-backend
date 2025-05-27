@@ -8,18 +8,18 @@ export enum Genero {
 }
 
 export interface Persona {
-    id: UUID,
+    id: string,
     nombre : string,
     apellido : string,
     dni : string,
     fechaNacimiento: Date,
     genero: Genero
     donanteDeOrganos: boolean,
-    autos: Auto[]
+    autos: string[]
 }
 
 export type PersonaResumen = {
-    id:UUID,
+    id:string,
     nombre: string;
     apellido: string;
     dni: string;

@@ -8,6 +8,6 @@ export interface AutoRepository {
   update(id: string, data: Partial<Auto>): Promise<Auto | null>;
   delete(id: string): Promise<void>;
   setAutos(autos: Auto[]): Promise<void>;
-  autosByIdDuenio(idDuenio: string): Promise<Auto[]>;
+  autosByIdDuenio(idDuenio: string): Promise<AutoResumen[]>;
   deleteAutosByIdDuenio(idDuenio: string): Promise<void>;
 }

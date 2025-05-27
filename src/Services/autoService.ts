@@ -29,7 +29,7 @@ export class AutoService {
     return this.repository.delete(id);
   }
 
-  autosByIdDuenio(id: string): Promise<Auto[]>{
+  autosByIdDuenio(id: string): Promise<AutoResumen[]>{
       return this.repository.autosByIdDuenio(id);
   }
 

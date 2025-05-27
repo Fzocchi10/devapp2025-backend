@@ -1,6 +1,6 @@
 import { PersonaRepository } from "../Repositories/personaRepository";
 import { Persona, PersonaResumen } from "../Modelo/Persona";
-import { Auto } from "../Modelo/Auto";
+import { Auto, AutoResumen } from "../Modelo/Auto";
 
 export class PersonaService {
 
@@ -34,11 +34,11 @@ export class PersonaService {
     return this.repository.delete(id);
   }
 
-  addAuto(id:string, auto: Auto): Promise<void>{
-    return this.repository.addAuto(id,auto);
+  addAuto(id:string, idAuto: string): Promise<void>{
+    return this.repository.addAuto(id,idAuto);
   }
 
-  autosById(id:string): Promise<Auto[]>{
+  autosById(id:string): Promise<AutoResumen[]>{
     return this.repository.getAutosById(id);
   }
 

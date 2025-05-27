@@ -1,5 +1,5 @@
 import { randomUUID} from "crypto";
-import { Auto } from "../../Modelo/Auto";
+import { Auto, AutoResumen } from "../../Modelo/Auto";
 import { Persona, PersonaResumen } from "../../Modelo/Persona";
 import { PersonaRepository } from "../personaRepository";
 import { PersonaDocument } from "../../Modelo/PersonaModel";
@@ -19,15 +19,15 @@ export class mongoPersonaRepository implements PersonaRepository {
         return resultado;
     }
 
-    async getAutosById(id: string): Promise<Auto[]> {
+    async getAutosById(id: string): Promise<AutoResumen[]> {
         const autos = await autosService.autosByIdDuenio(id);
         return autos;
     }
 
-    async addAuto(id: string, auto: Auto): Promise<void> {
+    async addAuto(id: string, idAuto: string): Promise<void> {
         const result = await this.modelPersona.updateOne(
             { id },
-            { $push: { autos: auto.id } }
+            { $push: { autos: idAuto } }
         );
     }
 
