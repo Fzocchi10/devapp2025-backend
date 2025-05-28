@@ -1,5 +1,5 @@
 import {autosService} from "../../server"
-import { Auto, AutoResumen } from "../../Modelo/Auto";
+import { AutoResumen } from "../../Modelo/Auto";
 import { Genero, Persona, PersonaResumen } from "../../Modelo/Persona";
 import { PersonaRepository } from "../personaRepository";
 import { randomUUID } from "crypto";
@@ -22,13 +22,6 @@ export class memoryPersonaRepository implements PersonaRepository {
   async getAutosById(id: string): Promise<AutoResumen[]> {
     const autos = await autosService.autosByIdDuenio(id);
     return autos;
-  }
-
-  async addAuto(id: string, autoId: string): Promise<void> {
-    const persona = await this.getById(id);
-    if (persona) {
-      persona.autos.push(autoId);
-    }
   }
 
   async getListar(): Promise<PersonaResumen[]>{
@@ -68,24 +61,16 @@ export class memoryPersonaRepository implements PersonaRepository {
   }
 
   async delete(id: string): Promise<void> {
+    await autosService.deleteAutosByIdDuenio(id);
     const index = personasEnMemoria.findIndex(p => p.id === id);
-    const autosEnMemoria = await autosService.getAll();
+
     if (index === -1) {
       throw new Error("Persona no encontrada");
     }
-
     const persona = personasEnMemoria[index];
-    const autosDeLaPersona = await this.getAutosById(persona.id);
-    const autosEliminados = await autosEnMemoria.filter(a => !autosDeLaPersona.some(auto => auto.id === a.id));
+    await this.getAutosById(persona.id);
 
-
-    await autosService.setAutos(autosEliminados);
     personasEnMemoria.splice(index, 1);
 
-  }
-
-
-  deleteAuto(id: string, idDuenio: string): Promise<void> {
-    throw new Error("Method not implemented.");
   }
 }

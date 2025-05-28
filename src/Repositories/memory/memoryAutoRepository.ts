@@ -1,8 +1,6 @@
 import { randomUUID, UUID } from "crypto";
 import { Auto, AutoResumen } from "../../Modelo/Auto";
 import { AutoRepository } from "../AutoRepository";
-import { personaService } from "../../server";
-import { Persona } from "../../Modelo/Persona";
 
 let autosEnMemoria: Auto[] = [];
 
@@ -29,7 +27,6 @@ export class memoryAutoRepository implements AutoRepository{
             id: randomUUID(),
             duenioId: idDuenio
         }
-        personaService.addAuto(idDuenio, nuevoAuto.id);
         autosEnMemoria.push(nuevoAuto);
         return nuevoAuto;
     }
@@ -49,10 +46,7 @@ export class memoryAutoRepository implements AutoRepository{
         if (!auto) {
             throw new Error('Auto no existe');
         }
-        const persona = await personaService.getById(auto.duenioId) as Persona;
         autosEnMemoria = autosEnMemoria.filter(a => a.id !== id);
-        persona.autos = persona.autos.filter(a => a !== id);
-        await personaService.update(persona.id,persona)
     }
 
     async autosByIdDuenio(idDuenio: string): Promise<AutoResumen[]> {
@@ -66,11 +60,9 @@ export class memoryAutoRepository implements AutoRepository{
             patente: a.patente
         }));
     }
-    async setAutos(autos: Auto[]): Promise<void> {
-        autosEnMemoria = autos;
-    }
 
-    deleteAutosByIdDuenio(idDuenio: string): Promise<void> {
-        throw new Error("Method not implemented.");
+    async deleteAutosByIdDuenio(idDuenio: string): Promise<void> {
+        const autosActualizados = await autosEnMemoria.filter(a => a.duenioId !== idDuenio);
+        autosEnMemoria = autosActualizados;
     }
 }

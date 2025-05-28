@@ -95,9 +95,7 @@ export class fbPersonaRepository implements PersonaRepository{
 
         await this.update(id, {nuevosAutos} as Partial<Persona>);
     }
-    deleteAuto(id: string, idDuenio: string): Promise<void> {
-        throw new Error("Method not implemented.");
-    }
+
     getAutosById(id: string): Promise<AutoResumen[]> {
         throw new Error("Method not implemented.");
     }

@@ -37,8 +37,4 @@ export class AutoService {
     return this.repository.deleteAutosByIdDuenio(idDuenio);
   }
 
-  setAutos(autos:Auto[]): Promise<void>{
-    return this.repository.setAutos(autos);
-  }
-
 }

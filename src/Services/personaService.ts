@@ -34,15 +34,8 @@ export class PersonaService {
     return this.repository.delete(id);
   }
 
-  addAuto(id:string, idAuto: string): Promise<void>{
-    return this.repository.addAuto(id,idAuto);
-  }
-
   autosById(id:string): Promise<AutoResumen[]>{
     return this.repository.getAutosById(id);
   }
 
-  deleteAuto(id:string, idDuenio:string):Promise<void>{
-    return this.repository.deleteAuto(id,idDuenio);
-  }
 }

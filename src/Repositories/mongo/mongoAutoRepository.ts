@@ -3,7 +3,6 @@ import { Auto, AutoResumen } from "../../Modelo/Auto";
 import { AutoDocument } from "../../Modelo/AutoModel";
 import { AutoRepository } from "../AutoRepository";
 import { randomUUID, UUID } from "crypto";
-import { personaService } from "../../server";
 
 export class mongoAutoRepository implements AutoRepository {
     private modelAuto: Model<AutoDocument>;
@@ -36,7 +35,6 @@ export class mongoAutoRepository implements AutoRepository {
         };
 
         await this.modelAuto.create(autoCompleto);
-        await personaService.addAuto(idDuenio, autoCompleto.id);
         return (autoCompleto);
 
     }
@@ -49,7 +47,6 @@ export class mongoAutoRepository implements AutoRepository {
     async delete(id: string): Promise<void> {
         const duenioId = await this.modelAuto.findOne({id});
         await this.modelAuto.deleteOne({id});
-        await personaService.deleteAuto(id, duenioId?.duenioId as string);
     }
 
     async autosByIdDuenio(idDuenio: string): Promise<AutoResumen[]> {
@@ -61,7 +58,4 @@ export class mongoAutoRepository implements AutoRepository {
         await this.modelAuto.deleteMany({ duenioId: idDuenio });
     }
 
-    setAutos(autos:Auto[]): Promise<void> {
-        throw new Error("Method not implemented.");
-    }
 }

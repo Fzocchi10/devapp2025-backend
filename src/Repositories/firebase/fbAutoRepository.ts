@@ -62,8 +62,7 @@ export class fbAutoRepository implements AutoRepository{
             ...data,
             duenioId: idDuenio
         };
-        const agregoAuto = await this.colleccion.add(nuevoAuto);
-        await personaService.addAuto(idDuenio, agregoAuto.id)
+        await this.colleccion.add(nuevoAuto);
 
         return nuevoAuto;
     }
@@ -93,9 +92,6 @@ export class fbAutoRepository implements AutoRepository{
         const auto = await this.colleccion.where('id', '==', id).get();
         const autoRef = auto.docs[0].ref;
         await autoRef.delete();
-    }
-    setAutos(autos: Auto[]): Promise<void> {
-        throw new Error("Method not implemented.");
     }
 
     async autosByIdDuenio(idDuenio: string): Promise<AutoResumen[]> {
