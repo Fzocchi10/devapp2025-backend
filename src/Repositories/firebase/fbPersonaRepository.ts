@@ -1,4 +1,4 @@
-import { Auto, AutoResumen } from "../../Modelo/Auto";
+import { AutoResumen } from "../../Modelo/Auto";
 import admin from 'firebase-admin';
 import { Persona, PersonaResumen } from "../../Modelo/Persona";
 import { PersonaRepository } from "../personaRepository";

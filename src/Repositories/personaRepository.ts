@@ -8,5 +8,4 @@ export interface PersonaRepository {
   create(data: Omit<Persona, "id" | "autos">): Promise<Persona>;
   update(id: string, data: Partial<Persona>): Promise<Persona | null>;
   delete(id: string): Promise<void>;
-  getAutosById(id:string): Promise<AutoResumen[]>;
 }

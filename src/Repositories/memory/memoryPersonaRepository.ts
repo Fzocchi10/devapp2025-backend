@@ -1,5 +1,4 @@
 import {autosService} from "../../server"
-import { AutoResumen } from "../../Modelo/Auto";
 import { Genero, Persona, PersonaResumen } from "../../Modelo/Persona";
 import { PersonaRepository } from "../personaRepository";
 import { randomUUID } from "crypto";
@@ -19,10 +18,6 @@ const personasEnMemoria: Persona[] = [
 ];
 
 export class memoryPersonaRepository implements PersonaRepository {
-  async getAutosById(id: string): Promise<AutoResumen[]> {
-    const autos = await autosService.autosByIdDuenio(id);
-    return autos;
-  }
 
   async getListar(): Promise<PersonaResumen[]>{
     const listaDePersonas = personasEnMemoria.map(({ id, nombre, apellido, dni }) => ({
@@ -67,10 +62,7 @@ export class memoryPersonaRepository implements PersonaRepository {
     if (index === -1) {
       throw new Error("Persona no encontrada");
     }
-    const persona = personasEnMemoria[index];
-    await this.getAutosById(persona.id);
 
     personasEnMemoria.splice(index, 1);
-
   }
 }

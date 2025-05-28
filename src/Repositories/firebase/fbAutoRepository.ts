@@ -1,6 +1,5 @@
 import { randomUUID } from "crypto";
 import { Auto, AutoResumen } from "../../Modelo/Auto";
-import { personaService } from "../../server";
 import { AutoRepository } from "../AutoRepository";
 import admin from 'firebase-admin';
 
