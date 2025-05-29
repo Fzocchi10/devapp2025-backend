@@ -1,8 +1,8 @@
-import { AutoResumen } from "../../Modelo/Auto";
 import admin from 'firebase-admin';
 import { Persona, PersonaResumen } from "../../Modelo/Persona";
 import { PersonaRepository } from "../personaRepository";
 import { randomUUID } from "crypto";
+import { autosService } from '../../server';
 
 export class fbPersonaRepository implements PersonaRepository{
     private colleccion;
@@ -87,16 +87,7 @@ export class fbPersonaRepository implements PersonaRepository{
         const persona = await this.colleccion.where('id', '==', id).get();
         const personaRef = persona.docs[0].ref;
         await personaRef.delete();
+        autosService.deleteAutosByIdDuenio(id);
     }
 
-    async addAuto(id: string, idAuto: string): Promise<void> {
-        const persona = await this.getById(id);
-        const nuevosAutos = persona?.autos ? [...persona.autos, idAuto] : [idAuto] ;
-
-        await this.update(id, {nuevosAutos} as Partial<Persona>);
-    }
-
-    getAutosById(id: string): Promise<AutoResumen[]> {
-        throw new Error("Method not implemented.");
-    }
 }

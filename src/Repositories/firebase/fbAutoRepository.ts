@@ -113,7 +113,12 @@ export class fbAutoRepository implements AutoRepository{
        return autosByIdDuenio;
 
     }
-    deleteAutosByIdDuenio(idDuenio: string): Promise<void> {
-        throw new Error("Method not implemented.");
+
+    async deleteAutosByIdDuenio(idDuenio: string): Promise<void> {
+        const listaDeAutosDelDuenio =  await this.colleccion.where('duenioId', '==', idDuenio).get();
+
+        for (const doc of listaDeAutosDelDuenio.docs) {
+            await doc.ref.delete();
+        }
     }
 }

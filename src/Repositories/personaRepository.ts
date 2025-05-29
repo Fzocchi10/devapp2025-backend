@@ -1,4 +1,3 @@
-import { AutoResumen } from "../Modelo/Auto";
 import { Persona, PersonaResumen } from "../Modelo/Persona";
 
 export interface PersonaRepository {
